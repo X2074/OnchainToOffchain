@@ -1,4 +1,5 @@
 const Contract = require('../models/contract')
+const eventService  = require('./event')
 
 exports.find = async () => {
     const contracts = await Contract.find()
@@ -22,6 +23,7 @@ exports.findDetailByAddress = async (address) => {
 
 exports.deleteByAddress = async (address) =>{
     const contract = await Contract.findOneAndRemove({address: address.toLowerCase()})
+    await eventService.deleteEventsByAddress(address)
     return contract
 }
 

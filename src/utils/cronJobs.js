@@ -35,7 +35,6 @@ exports.scanContracts = async () => {
                 await contractRecord.save()
                 lastBlockNumber += batches
             }
-
         })
         await Promise.all(promises)
         console.log(`————合约事件记录完成 ${new Date()}————`)
