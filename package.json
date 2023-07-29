@@ -1,0 +1,37 @@
+{
+  "name": "onchaintooffchain",
+  "version": "1.0.0",
+  "description": "OnchainToOffchain: A blockchain oriented data synchronization tool that synchronizes on chain transaction data to offline databases, facilitating further development of complex business scenarios.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/X2074/OnchainToOffchain.git"
+  },
+  "author": "Qitmeer Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/X2074/OnchainToOffchain/issues"
+  },
+  "homepage": "https://github.com/X2074/OnchainToOffchain#readme",
+  "dependencies": {
+    "cron": "^2.4.0",
+    "koa": "^2.14.2",
+    "koa-bodyparser": "^4.4.1",
+    "koa-json-error": "^3.1.2",
+    "koa-jwt": "^4.0.4",
+    "koa-log4": "^2.3.2",
+    "koa-parameter": "^3.0.1",
+    "koa-router": "^12.0.0",
+    "mongoose": "^7.4.1",
+    "web3": "^4.0.3"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "nodemon": "^3.0.1"
+  }
+}
