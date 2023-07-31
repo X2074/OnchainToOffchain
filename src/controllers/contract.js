@@ -141,10 +141,11 @@ class ContractCtl {
         if(!queryCriteria || !queryCriteria.address){
             ctx.throw(400,'The query criteria must include contract address information. Such as: { address: \'Your_Contract_Address\' }')
         }
-        const sortCriteria = ctx.query.sortCriteria ? ctx.query.sortCriteria : {}
-        const page = ctx.query.page ? ctx.query.page : 1
-        const pageSize = ctx.query.pageSize ? ctx.query.pageSize : 10
-        const events = await eventService.find(queryCriteria,sortCriteria,page,pageSize)
+        const selectField = ctx.request.body.selectField ? ctx.request.body.selectField : ''
+        const sortCriteria = ctx.request.body.sortCriteria ? ctx.request.body.sortCriteria : {}
+        const page = ctx.request.body.page ? ctx.request.body.page : 1
+        const pageSize = ctx.request.body.pageSize ? ctx.request.body.pageSize : 10
+        const events = await eventService.find(queryCriteria,selectField,sortCriteria,page,pageSize)
         ctx.body = events
     }
 

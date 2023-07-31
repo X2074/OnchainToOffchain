@@ -17,6 +17,9 @@ exports.formatEvents = async (events) => {
             newEvent.blockNumber = Number(event.blockNumber)
             newEvent.transactionIndex = Number(event.transactionIndex)
             newEvent.logIndex = Number(event.logIndex)
+            Object.keys(newEvent.returnValues).forEach(key => {
+                newEvent.returnValues[key] = newEvent.returnValues[key].toString();
+            });
             return newEvent
         })
         promises.push(promise)

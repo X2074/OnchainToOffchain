@@ -1,13 +1,13 @@
 const Contract = require('../models/contract')
-const eventService  = require('./event')
+const eventService = require('./event')
 
 exports.find = async () => {
     const contracts = await Contract.find();
     return contracts
 }
 
-exports.findDetail = async () => {
-    const contracts = await Contract.find().select('+abi');
+exports.find = async (queryCriteria, selectField) => {
+    const contracts = await Contract.find(queryCriteria).select(selectField).exec();
     return contracts
 }
 
@@ -21,7 +21,7 @@ exports.findDetailByAddress = async (address) => {
     return contract
 }
 
-exports.deleteByAddress = async (address) =>{
+exports.deleteByAddress = async (address) => {
     const contract = await Contract.findOneAndRemove({address: address.toLowerCase()})
     await eventService.deleteEventsByAddress(address)
     return contract
@@ -49,8 +49,10 @@ exports.stopScanning = async (address) => {
 
 exports.clearEvents = async (address) => {
     //暂停事件扫描任务
-    const contract = await Contract.findOneAndUpdate({address: address.toLowerCase()},{scannable: false})
-    if(!contract) { return contract }
+    const contract = await Contract.findOneAndUpdate({address: address.toLowerCase()}, {scannable: false});
+    if (!contract) {
+        return contract
+    }
     await eventService.deleteEventsByAddress(address)
     //重启事件扫描任务，并更新起始块
     return Contract.findOneAndUpdate({address: address.toLowerCase()}, {

@@ -14,15 +14,14 @@ exports.findByAddress = async (address) => {
     const events = await Event.find({address: address.toLowerCase()})
     return events
 }
-exports.find = async (queryCriteria,sortCriteria,page,pageSize) => {
+exports.find = async (queryCriteria, selectField, sortCriteria, page, pageSize) => {
     const events = await Event
         .find(queryCriteria)// 查询条件
+        .select(selectField)
         .sort(sortCriteria)// 多字段排序条件 例如：{time: 1, event: -1} 表示先按时间正序，再按时间倒序
 
         .skip((page - 1) * pageSize) // 跳过前面的页数
         .limit(pageSize) // 指定每页的大小
         .exec(); // 执行查询
-    console.log(queryCriteria)
-    console.log(events)
     return events
 }
