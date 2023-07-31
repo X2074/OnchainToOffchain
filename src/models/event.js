@@ -19,5 +19,7 @@ const eventSchema = new Schema({
     signature: {type: String, require: true},
     raw: {type: Array, require: true}
 })
+//根据时间建立倒序索引
+eventSchema.index({time: -1})
 
 module.exports = model('Event', eventSchema)

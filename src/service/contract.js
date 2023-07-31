@@ -2,23 +2,19 @@ const Contract = require('../models/contract')
 const eventService  = require('./event')
 
 exports.find = async () => {
-    const contracts = await Contract.find()
-    return contracts
+    return Contract.find();
 }
 
 exports.findDetail = async () => {
-    const contracts = await Contract.find().select('+abi')
-    return contracts
+    return Contract.find().select('+abi');
 }
 
 exports.findByAddress = async (address) => {
-    const contract = await Contract.findOne({address: address.toLowerCase()})
-    return contract
+    return Contract.findOne({address: address.toLowerCase()});
 }
 
 exports.findDetailByAddress = async (address) => {
-    const contract = await Contract.findOne({address: address.toLowerCase()}).select('+abi')
-    return contract
+    return Contract.findOne({address: address.toLowerCase()}).select('+abi');
 }
 
 exports.deleteByAddress = async (address) =>{
@@ -28,6 +24,29 @@ exports.deleteByAddress = async (address) =>{
 }
 
 exports.addContract = async (contractData) => {
-    const contract = await new Contract(contractData).save()
-    return contract
+    return await new Contract(contractData).save()
+}
+
+exports.update = async (address, contractData) => {
+    return Contract.findOneAndUpdate({address: address.toLowerCase()}, contractData);
+}
+
+exports.startScanning = async (address) => {
+    return Contract.findOneAndUpdate({address: address.toLowerCase()}, {scannable: true});
+}
+
+exports.stopScanning = async (address) => {
+    return Contract.findOneAndUpdate({address: address.toLowerCase()}, {scannable: false});
+}
+
+exports.clearEvents = async (address) => {
+    //暂停事件扫描任务
+    const contract = await Contract.findOneAndUpdate({address: address.toLowerCase()},{scannable: false})
+    if(!contract) { return contract}
+    await eventService.deleteEventsByAddress(address)
+    //重启事件扫描任务，并更新起始块
+    return Contract.findOneAndUpdate({address: address.toLowerCase()}, {
+        scannable: false,
+        lastScannedBlock: contract.createdBlock ? contract.createdBlock : 0
+    });
 }

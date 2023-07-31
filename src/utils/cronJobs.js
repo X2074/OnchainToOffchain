@@ -14,6 +14,10 @@ exports.scanContracts = async () => {
         const currentBlockNumber = await web3.eth.getBlockNumber()
         console.log(`————开始扫描合约事件 ${new Date()}————`)
         const promises = contracts.map(async (contractRecord) => {
+            //查询事件前检查合约是否需要扫描
+            if(!contractRecord.scannable){
+                return
+            }
             const contract = await new web3.eth.Contract(contractRecord.abi, contractRecord.address)
             //分批次获取事件
             var lastBlockNumber = contractRecord.createdBlock ? contractRecord.createdBlock : contractRecord.lastScannedBlock
@@ -25,14 +29,18 @@ exports.scanContracts = async () => {
                 })
                 const events = await formatEvents([...newEvents])
                 console.log(events)
+                const newContract = await contractService.findByAddress(contractRecord.address())
+                //记录事件前检查合约是否需要扫描
+                if(!newContract.scannable){
+                    return
+                }
                 //记录事件
                 const eventPromises = events.map(async (event) => {
                     await eventService.addEvent(event)
                 })
                 await Promise.all(eventPromises)
                 //更新合约记录
-                contractRecord.lastScannedBlock = targetBlock
-                await contractRecord.save()
+                await contractService.update(contractRecord.address,{lastScannedBlock: targetBlock})
                 lastBlockNumber += batches
             }
         })

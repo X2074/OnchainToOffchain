@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const { Schema, model } = mongoose
+const {Schema, model} = mongoose
 
 const contractSchema = new Schema({
     __v: {type: Number, select: false},
@@ -11,7 +11,8 @@ const contractSchema = new Schema({
     createdHash: {type: String, require: false},
     createdTime: {type: Date, require: false},
     createdBlock: {type: Number, require: false},
-    lastScannedBlock: { type: Number, default: 0 },
+    lastScannedBlock: {type: Number, default: 0},
+    scannable: {type: Boolean, default: true}
 })
 
 module.exports = model('Contract', contractSchema)
