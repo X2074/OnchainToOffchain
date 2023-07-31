@@ -34,7 +34,7 @@ db.once('open', function() {
 /**
  * 定期获取合约事件 5分钟执行一次
  */
-new CronJob('0 */1 * * * *', function() {
+new CronJob('0 */5 * * * *', function() {
     scanContracts()
 }, null, true)
 
