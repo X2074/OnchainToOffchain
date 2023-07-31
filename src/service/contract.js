@@ -2,19 +2,23 @@ const Contract = require('../models/contract')
 const eventService  = require('./event')
 
 exports.find = async () => {
-    return Contract.find();
+    const contracts = await Contract.find();
+    return contracts
 }
 
 exports.findDetail = async () => {
-    return Contract.find().select('+abi');
+    const contracts = await Contract.find().select('+abi');
+    return contracts
 }
 
 exports.findByAddress = async (address) => {
-    return Contract.findOne({address: address.toLowerCase()});
+    const contract = await Contract.findOne({address: address.toLowerCase()});
+    return contract
 }
 
 exports.findDetailByAddress = async (address) => {
-    return Contract.findOne({address: address.toLowerCase()}).select('+abi');
+    const contract = await Contract.findOne({address: address.toLowerCase()}).select('+abi');
+    return contract
 }
 
 exports.deleteByAddress = async (address) =>{
@@ -24,25 +28,29 @@ exports.deleteByAddress = async (address) =>{
 }
 
 exports.addContract = async (contractData) => {
-    return await new Contract(contractData).save()
+    const contract = await new Contract(contractData).save()
+    return contract
 }
 
 exports.update = async (address, contractData) => {
-    return Contract.findOneAndUpdate({address: address.toLowerCase()}, contractData);
+    const contract = await Contract.findOneAndUpdate({address: address.toLowerCase()}, contractData);
+    return contract
 }
 
 exports.startScanning = async (address) => {
-    return Contract.findOneAndUpdate({address: address.toLowerCase()}, {scannable: true});
+    const contract = await Contract.findOneAndUpdate({address: address.toLowerCase()}, {scannable: true});
+    return contract
 }
 
 exports.stopScanning = async (address) => {
-    return Contract.findOneAndUpdate({address: address.toLowerCase()}, {scannable: false});
+    const contract = await Contract.findOneAndUpdate({address: address.toLowerCase()}, {scannable: false});
+    return contract
 }
 
 exports.clearEvents = async (address) => {
     //暂停事件扫描任务
     const contract = await Contract.findOneAndUpdate({address: address.toLowerCase()},{scannable: false})
-    if(!contract) { return contract}
+    if(!contract) { return contract }
     await eventService.deleteEventsByAddress(address)
     //重启事件扫描任务，并更新起始块
     return Contract.findOneAndUpdate({address: address.toLowerCase()}, {

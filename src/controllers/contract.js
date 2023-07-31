@@ -19,7 +19,7 @@ class ContractCtl {
      */
     async findByAddress(ctx) {
         const contract = await contractService.findByAddress(ctx.params.address)
-        if(!contract) { ctx.throw(404) }
+        if(!contract) { ctx.throw(404,'No eligible contracts exist') }
         ctx.body = contract
     }
 
@@ -82,7 +82,7 @@ class ContractCtl {
      */
     async deleteByAddress(ctx) {
         const contract = await contractService.deleteByAddress(ctx.params.address)
-        if(!contract) { ctx.throw(404) }
+        if(!contract) { ctx.throw(404,'No eligible contracts exist') }
         ctx.status = 204
     }
 
@@ -92,7 +92,7 @@ class ContractCtl {
      */
     async startScanning(ctx) {
         const contract = await contractService.startScanning(ctx.params.address)
-        if(!contract) { ctx.throw(404) }
+        if(!contract) { ctx.throw(404,'No eligible contracts exist') }
         ctx.body = contract
     }
 
@@ -103,7 +103,7 @@ class ContractCtl {
      */
     async stopScanning(ctx) {
         const contract = await contractService.stopScanning(ctx.params.address)
-        if(!contract) { ctx.throw(404) }
+        if(!contract) { ctx.throw(404,'No eligible contracts exist') }
         ctx.body = contract
     }
 
@@ -114,7 +114,7 @@ class ContractCtl {
      */
     async clearEvents(ctx){
         const contract = await contractService.clearEvents(ctx.params.address)
-        if(!contract) { ctx.throw(404) }
+        if(!contract) { ctx.throw(404,'No eligible contracts exist') }
         ctx.body = contract
     }
 
@@ -124,6 +124,7 @@ class ContractCtl {
      */
     async getAllEvents(ctx){
         const events = await eventService.findByAddress(ctx.params.address)
+        console.log(events)
         ctx.body = events
     }
 
@@ -133,20 +134,18 @@ class ContractCtl {
      */
     async getEvents(ctx) {
         ctx.verifyParams({
-            queryCriteria: {type: 'object', require: true},
-            sortCriteria: {type: 'object', require: false},
-            page: {type: 'number', require: false, default: 1},
-            pageSize: {type: 'number', require: false, default: 10},
+            queryCriteria: {type: 'object', require: true}
         })
-        const queryCriteria = ctx.query.queryCriteria
+        const queryCriteria = ctx.request.body.queryCriteria
+        queryCriteria.address = queryCriteria.address.toLowerCase()
         if(!queryCriteria || !queryCriteria.address){
             ctx.throw(400,'The query criteria must include contract address information. Such as: { address: \'Your_Contract_Address\' }')
         }
         const sortCriteria = ctx.query.sortCriteria ? ctx.query.sortCriteria : {}
-        const page = ctx.query.page ? ctx.query.page : 0
+        const page = ctx.query.page ? ctx.query.page : 1
         const pageSize = ctx.query.pageSize ? ctx.query.pageSize : 10
         const events = await eventService.find(queryCriteria,sortCriteria,page,pageSize)
-        ctx.body = {events, total: events.length}
+        ctx.body = events
     }
 
 }

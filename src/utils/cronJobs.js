@@ -7,7 +7,7 @@ const { formatEvents } = require('../utils/format')
  * 定期获取合约事件 5分钟执行一次
  */
 exports.scanContracts = async () => {
-    const contracts = (await contractService.findDetail())
+    const contracts = await contractService.findDetail()
     if(contracts.length>0){
         const httpProvider = new Web3.providers.HttpProvider(rpc);
         const web3 = new Web3(httpProvider);
@@ -29,7 +29,7 @@ exports.scanContracts = async () => {
                 })
                 const events = await formatEvents([...newEvents])
                 console.log(events)
-                const newContract = await contractService.findByAddress(contractRecord.address())
+                const newContract = await contractService.findByAddress(contractRecord.address)
                 //记录事件前检查合约是否需要扫描
                 if(!newContract.scannable){
                     return

@@ -15,6 +15,8 @@ exports.formatEvents = async (events) => {
             const newEvent = event
             newEvent.time =  new Date(Number(timestamp) * 1000) // 将Unix时间戳转换为Date对象
             newEvent.blockNumber = Number(event.blockNumber)
+            newEvent.transactionIndex = Number(event.transactionIndex)
+            newEvent.logIndex = Number(event.logIndex)
             return newEvent
         })
         promises.push(promise)
