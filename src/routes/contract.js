@@ -9,7 +9,7 @@ router.post('/', registerContract)
 router.delete('/:address',deleteByAddress)
 router.post('/:address/scanning/start',startScanning())
 router.post('/:address/scanning/stop',stopScanning())
-router.get('/:address/events/all',getAllEvents)
+router.get('/:address/events/all',getAllEvents())
 router.post('/:address/events/clear',clearEvents())
 router.post('/evnets/query',getEvents())
 
