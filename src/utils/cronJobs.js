@@ -28,7 +28,6 @@ exports.scanContracts = async () => {
                     toBlock: targetBlock
                 })
                 const events = await formatEvents([...newEvents])
-                console.log(events)
                 const newContract = await contractService.findByAddress(contractRecord.address)
                 //记录事件前检查合约是否需要扫描
                 if(!newContract.scannable){
@@ -40,7 +39,7 @@ exports.scanContracts = async () => {
                 })
                 await Promise.all(eventPromises)
                 //更新合约记录
-                await contractService.update(contractRecord.address,{lastScannedBlock: targetBlock})
+                await contractService.update(contractRecord.address,{lastScannedBlock: Number(targetBlock)})
                 lastBlockNumber += batches
             }
         })

@@ -18,7 +18,13 @@ exports.formatEvents = async (events) => {
             newEvent.transactionIndex = Number(event.transactionIndex)
             newEvent.logIndex = Number(event.logIndex)
             Object.keys(newEvent.returnValues).forEach(key => {
-                newEvent.returnValues[key] = newEvent.returnValues[key].toString();
+                if(typeof(newEvent.returnValues[key])==='object'){
+                    Object.keys(newEvent.returnValues[key]).forEach(key2 => {
+                        newEvent.returnValues[key][key2] = newEvent.returnValues[key][key2].toString()
+                    })
+                }else{
+                    newEvent.returnValues[key] = newEvent.returnValues[key].toString();
+                }
             });
             return newEvent
         })

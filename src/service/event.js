@@ -6,8 +6,6 @@ exports.addEvent = async (eventData) => {
 }
 exports.deleteEventsByAddress = async (address) => {
     const events = await Event.deleteMany({address: address.toLowerCase()})
-    console.log(address)
-    console.log(events)
     return events
 }
 exports.findByAddress = async (address) => {

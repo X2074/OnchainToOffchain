@@ -33,30 +33,31 @@ exports.addContract = async (contractData) => {
 }
 
 exports.update = async (address, contractData) => {
-    const contract = await Contract.findOneAndUpdate({address: address.toLowerCase()}, contractData);
+    const contract = await Contract.findOneAndUpdate({address: address.toLowerCase()}, contractData, { new: true });
     return contract
 }
 
 exports.startScanning = async (address) => {
-    const contract = await Contract.findOneAndUpdate({address: address.toLowerCase()}, {scannable: true});
+    const contract = await Contract.findOneAndUpdate({address: address.toLowerCase()}, {scannable: true}, { new: true });
     return contract
 }
 
 exports.stopScanning = async (address) => {
-    const contract = await Contract.findOneAndUpdate({address: address.toLowerCase()}, {scannable: false});
+    const contract = await Contract.findOneAndUpdate({address: address.toLowerCase()}, {scannable: false}, { new: true });
     return contract
 }
 
 exports.clearEvents = async (address) => {
-    //暂停事件扫描任务
-    const contract = await Contract.findOneAndUpdate({address: address.toLowerCase()}, {scannable: false});
+    const contract = await Contract.findOne({address: address.toLowerCase()});
     if (!contract) {
         return contract
     }
+    const scannable = contract.scannable
+    //如果原先服务未停止，暂停事件扫描任务
+    if(scannable){
+        await Contract.findOneAndUpdate({address: address.toLowerCase()}, {scannable: false});
+    }
     await eventService.deleteEventsByAddress(address)
-    //重启事件扫描任务，并更新起始块
-    return Contract.findOneAndUpdate({address: address.toLowerCase()}, {
-        scannable: false,
-        lastScannedBlock: contract.createdBlock ? contract.createdBlock : 0
-    });
+    //更新起始块
+    return Contract.findOneAndUpdate({address: address.toLowerCase()}, {scannable, lastScannedBlock: contract.createdBlock ? contract.createdBlock : 0}, { new: true });
 }
