@@ -10,7 +10,8 @@ const {
     stopScanning,
     getAllEvents,
     clearEvents,
-    getEvents
+    getEvents,
+    getEventsStatistics
 } = require('../controllers/contract')
 
 router.get('/', find)
@@ -21,6 +22,7 @@ router.post('/:address/scanning/start', startScanning)
 router.post('/:address/scanning/stop', stopScanning)
 router.post('/:address/events/clear', clearEvents)
 router.post('/events/query', getEvents)
+router.post('/events/statistics', getEventsStatistics)
 router.delete('/:address', deleteByAddress)
 
 module.exports = router
