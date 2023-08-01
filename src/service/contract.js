@@ -1,12 +1,17 @@
 const Contract = require('../models/contract')
 const eventService = require('./event')
 
-exports.find = async () => {
-    const contracts = await Contract.find();
-    return contracts
+exports.find = async (page, pageSize) => {
+    const total = await Contract.countDocuments()
+    const contracts = await Contract
+        .find()
+        .skip((page - 1) * pageSize) // 跳过前面的页数
+        .limit(pageSize) // 指定每页的大小
+        .exec(); // 执行查询;
+    return {total: total, contracts: contracts, page: page, pageSize: pageSize}
 }
 
-exports.find = async (queryCriteria, selectField) => {
+exports.findAllDetail = async (queryCriteria, selectField) => {
     const contracts = await Contract.find(queryCriteria).select(selectField).exec();
     return contracts
 }

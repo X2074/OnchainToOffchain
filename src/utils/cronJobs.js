@@ -7,7 +7,7 @@ const { formatEvents } = require('../utils/format')
  * 定期获取合约事件 5分钟执行一次
  */
 exports.scanContracts = async () => {
-    const contracts = await contractService.find({scannable: true},'address createdBlock lastScannedBlock scannable abi')
+    const contracts = await contractService.findAllDetail({scannable: true},'address createdBlock lastScannedBlock scannable abi')
     if(contracts.length>0){
         const httpProvider = new Web3.providers.HttpProvider(rpc);
         const web3 = new Web3(httpProvider);

@@ -12,8 +12,10 @@ class ContractCtl {
      * @param ctx
      */
     async find(ctx) {
-        const contracts = await contractService.find()
-        ctx.body = {"contracts": contracts}
+        const page = ctx.query.page ? ctx.query.page : 1
+        const pageSize = ctx.query.pageSize ? ctx.query.pageSize : 10
+        const result = await contractService.find(page, pageSize)
+        ctx.body = result
     }
 
     /**
@@ -138,8 +140,10 @@ class ContractCtl {
      * @param ctx
      */
     async getAllEvents(ctx) {
-        const events = await eventService.findByAddress(ctx.params.address)
-        ctx.body = events
+        const page = ctx.query.page ? ctx.query.page : 1
+        const pageSize = ctx.query.pageSize ? ctx.query.pageSize : 10
+        const result = await eventService.findByAddress(ctx.params.address, page, pageSize)
+        ctx.body = result
     }
 
     /**
@@ -162,11 +166,13 @@ class ContractCtl {
         }
         const selectField = ctx.request.body.selectField ? ctx.request.body.selectField : ''
         const sortCriteria = ctx.request.body.sortCriteria ? ctx.request.body.sortCriteria : {time: -1}
+        //TODO 移除分页处理
         const page = ctx.request.body.page ? ctx.request.body.page : 1
         const pageSize = ctx.request.body.pageSize ? ctx.request.body.pageSize : 10
-        const events = await eventService.find(queryCriteria, selectField, sortCriteria, page, pageSize)
-        ctx.body = events
+        const result = await eventService.find(queryCriteria, selectField, sortCriteria, page, pageSize)
+        ctx.body = result
     }
+    //TODO 增加统计方法 （count/average/min/max）
 
 }
 

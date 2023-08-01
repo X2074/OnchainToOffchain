@@ -8,11 +8,17 @@ exports.deleteEventsByAddress = async (address) => {
     const events = await Event.deleteMany({address: address.toLowerCase()})
     return events
 }
-exports.findByAddress = async (address) => {
-    const events = await Event.find({address: address.toLowerCase()})
-    return events
+exports.findByAddress = async (address, page, pageSize) => {
+    const total = await Event.countDocuments({address: address.toLowerCase()})
+    const events = await Event
+        .find({address: address.toLowerCase()})
+        .skip((page - 1) * pageSize) // 跳过前面的页数
+        .limit(pageSize) // 指定每页的大小
+        .exec(); // 执行查询
+    return {total: total, events: events, page: page, pageSize: pageSize}
 }
 exports.find = async (queryCriteria, selectField, sortCriteria, page, pageSize) => {
+    const total = await Event.countDocuments(queryCriteria)
     const events = await Event
         .find(queryCriteria)// 查询条件
         .select(selectField)
@@ -21,5 +27,5 @@ exports.find = async (queryCriteria, selectField, sortCriteria, page, pageSize) 
         .skip((page - 1) * pageSize) // 跳过前面的页数
         .limit(pageSize) // 指定每页的大小
         .exec(); // 执行查询
-    return events
+    return {total: total, events: events, page: page, pageSize: pageSize}
 }
