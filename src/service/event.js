@@ -107,4 +107,10 @@ exports.getEventsStatistics = async (queryCriteria, unit, startTime, endTime, op
             }
         })
     })
+    // 转换为数组格式
+    const result = []
+    times.forEach(time => {
+        result.push({ time: time, ...statisticsData[time] })
+    })
+    return result
 };
