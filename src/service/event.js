@@ -41,20 +41,22 @@ exports.find = async (queryCriteria, selectField, sortCriteria, page, pageSize) 
 exports.getEventsStatistics = async (queryCriteria, unit, startTime, endTime, options) => {
     // 根据options涉及的字符串得到需要使用的信息
     const selectField = Object.keys(options).join(' ') + ' time'
-    console.log(selectField)
     // 通过queryCriteria与selectField获取到待统计的数据
     const events = await Event.find(queryCriteria).select(selectField).exec();
-    console.log(events)
     const times = []
-    let currentTime = dayjs(startTime).utc().startOf(unit)
-    const lastTime = dayjs(endTime).utc().startOf(unit)
-    while (currentTime.isSameOrBefore(lastTime)) {
-        if (unit === 'hour') {
-            times.push(currentTime.format('YYYY-MM-DD HH:00:00'))
-        } else {
-            times.push(currentTime.format('YYYY-MM-DD'))
+    if(unit === 'all'){
+        times.push('all')
+    }else{
+        let currentTime = dayjs(startTime).utc().startOf(unit)
+        const lastTime = dayjs(endTime).utc().startOf(unit)
+        while (currentTime.isSameOrBefore(lastTime)) {
+            if (unit === 'hour') {
+                times.push(currentTime.format('YYYY-MM-DD HH:00:00'))
+            } else {
+                times.push(currentTime.format('YYYY-MM-DD'))
+            }
+            currentTime = currentTime.add(1, unit)
         }
-        currentTime = currentTime.add(1, unit)
     }
     // 将原始记录按照时间分片统计
     const statisticsData = {}
@@ -64,22 +66,17 @@ exports.getEventsStatistics = async (queryCriteria, unit, startTime, endTime, op
             statisticsData[time][key] = []
         })
     })
-    console.log(statisticsData)
     events.forEach(event => {
-        const time = unit === 'hour' ? dayjs(event.time).utc().format('YYYY-MM-DD HH:00:00') : dayjs(event.time).utc().format('YYYY-MM-DD')
+        const time = unit === 'all' ? 'all' : unit === 'hour' ? dayjs(event.time).utc().format('YYYY-MM-DD HH:00:00') : dayjs(event.time).utc().format('YYYY-MM-DD')
         Object.keys(options).forEach(key => {
             const keyList = key.split('.').reverse()
             let tmp = event
             while (keyList.length > 0) {
                 tmp = tmp[keyList.pop()]
             }
-            console.log(time)
-            console.log(key)
-            console.log(tmp)
             statisticsData[time][key].push(tmp)
         })
     })
-    console.log(statisticsData)
     times.forEach(time => {
         Object.keys(options).forEach(key => {
             const tmpData = statisticsData[time][key]
