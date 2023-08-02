@@ -40,10 +40,11 @@ exports.find = async (queryCriteria, selectField, sortCriteria, page, pageSize) 
 
 exports.getEventsStatistics = async (queryCriteria, unit, startTime, endTime, options) => {
     // 根据options涉及的字符串得到需要使用的信息
-    const selectField = Object.keys(options).join(' ')
+    const selectField = Object.keys(options).join(' ') + ' time'
+    console.log(selectField)
     // 通过queryCriteria与selectField获取到待统计的数据
     const events = await Event.find(queryCriteria).select(selectField).exec();
-
+    console.log(events)
     const times = []
     let currentTime = dayjs(startTime).utc().startOf(unit)
     const lastTime = dayjs(endTime).utc().startOf(unit)
@@ -58,10 +59,12 @@ exports.getEventsStatistics = async (queryCriteria, unit, startTime, endTime, op
     // 将原始记录按照时间分片统计
     const statisticsData = {}
     times.forEach(time => {
+        statisticsData[time] = {}
         Object.keys(options).forEach(key => {
             statisticsData[time][key] = []
         })
     })
+    console.log(statisticsData)
     events.forEach(event => {
         const time = unit === 'hour' ? dayjs(event.time).utc().format('YYYY-MM-DD HH:00:00') : dayjs(event.time).utc().format('YYYY-MM-DD')
         Object.keys(options).forEach(key => {
@@ -70,6 +73,9 @@ exports.getEventsStatistics = async (queryCriteria, unit, startTime, endTime, op
             while (keyList.length > 0) {
                 tmp = tmp[keyList.pop()]
             }
+            console.log(time)
+            console.log(key)
+            console.log(tmp)
             statisticsData[time][key].push(tmp)
         })
     })

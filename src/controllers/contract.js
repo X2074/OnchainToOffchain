@@ -188,7 +188,7 @@ class ContractCtl {
         const endTime = ctx.request.body.endTime ? dayjs.utc(ctx.request.body.endTime).toDate() : dayjs.utc().toDate() //没有提供结束时间时默认使用当前时间
         const startTime = ctx.request.body.startTime ? dayjs.utc(ctx.request.body.startTime).toDate() : dayjs.utc(endTime).subtract(6, 'day').startOf('day').toDate() //没有提供结束时间时默认使用结束时间前7天的0点时间（也就是默认查询七天的数据）
         queryCriteria.time = {$gte: startTime, $lte: endTime}
-        const unit = ctx.request.body.unit; // "day" 或 "hour"
+        const unit = ctx.request.body.unit ? ctx.request.body.unit : 'day'; // "day" 或 "hour"
         const options = ctx.request.body.options; // 统计操作的描述（count/sum/average/min/max） 例如: { "returnValues.creator":"count","returnValues.metadata.royaltyFraction":"sum"}
         const result = await eventService.getEventsStatistics(queryCriteria, unit, startTime, endTime, options)
         ctx.body = result
