@@ -189,7 +189,7 @@ class ContractCtl {
         const endTime = ctx.request.body.endTime ? dayjs.utc(ctx.request.body.endTime).toDate() : dayjs.utc().toDate() //没有提供结束时间时默认使用当前时间
         const startTime = ctx.request.body.startTime ? dayjs.utc(ctx.request.body.startTime).toDate() : dayjs.utc(endTime).subtract(6, 'day').startOf('day').toDate() //没有提供结束时间时默认使用结束时间前7天的0点时间（也就是默认查询七天的数据）
         queryCriteria.time = {$gte: startTime, $lte: endTime}
-        const groupField = ctx.request.body.groupField ? ctx.request.body.groupField() : ''
+        const groupField = ctx.request.body.groupField ? ctx.request.body.groupField : ''
         const unit = ctx.request.body.unit ? ctx.request.body.unit.toLowerCase() : 'day'; // "day" 或 "hour" 或 "all"
         if(["day","hour","all"].indexOf(unit)<0){
             ctx.throw(400, 'Unit can only be \'day\', \'hour\', or \'all\'')
