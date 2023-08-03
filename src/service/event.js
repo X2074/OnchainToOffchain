@@ -45,7 +45,7 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
     // 根据options涉及的字符串得到需要使用的信息
     var selectField = Object.keys(options).join(' ') + ' time'
     const groups = groupField.split(' ')
-    if(groups.length()>0){
+    if(groups.length>0){
         selectField += ' ' + groups.join(' ')
     }
     // 通过queryCriteria与selectField获取到待统计的数据
@@ -69,7 +69,7 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
     const statisticsData = {}
     times.forEach(time => {
         statisticsData[time] = {}
-        if(groups.length()>0){
+        if(groups.length>0){
             groups.forEach(group => {
                 statisticsData[time][group] = {}
                 Object.keys(options).forEach(key => {
@@ -85,7 +85,7 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
     })
     events.forEach(event => {
         const time = unit === 'all' ? 'all' : unit === 'hour' ? dayjs(event.time).utc().format('YYYY-MM-DD HH:00:00') : dayjs(event.time).utc().format('YYYY-MM-DD')
-        if(groups.length()>0){
+        if(groups.length>0){
             groups.forEach(group => {
                 Object.keys(options).forEach(key => {
                     const keyList = key.split('.').reverse()
@@ -108,7 +108,7 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
         }
     })
     times.forEach(time => {
-        if(groups.length()>0){
+        if(groups.length>0){
             groups.forEach(group => {
                 Object.keys(options).forEach(key => {
                     const tmpData = statisticsData[time][group][key]
