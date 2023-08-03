@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/X2074/OnchainToOffchain#readme",
   "dependencies": {
+    "commander": "^11.0.0",
     "cron": "^2.4.0",
     "dayjs": "^1.11.9",
     "koa": "^2.14.2",
