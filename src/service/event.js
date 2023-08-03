@@ -89,6 +89,7 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
     times.forEach(time => {
         statisticsData[time] =  buildMultiLevelObject([...groups, 'options'], {...groupFields, options: Object.keys(options)});
     })
+    logger.info(statisticsData)
     events.forEach(event => {
         const time = unit === 'all' ? 'all' : unit === 'hour' ? dayjs(event.time).utc().format('YYYY-MM-DD HH:00:00') : dayjs(event.time).utc().format('YYYY-MM-DD')
         const keyList = []
@@ -116,8 +117,7 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
     })
     logger.info(statisticsData)
     times.forEach(time => {
-        const tmpData = statisticsData[time]
-        deepStatistics(tmpData, options)
+        statisticsData[time] = deepStatistics(statisticsData[time], options)
     })
     // 转换为数组格式
     const result = []
@@ -168,7 +168,6 @@ function buildMultiLevelObject(list, obj) {
 }
 
 function deepStatistics(obj, options) {
-    logger.info(obj)
     if(Array.isArray(obj)){
         Object.keys(options).forEach(key => {
             // 按照操作类型进行处理
@@ -206,7 +205,8 @@ function deepStatistics(obj, options) {
         })
     }else{
         Object.keys(obj).forEach(key=>{
-            deepStatistics(obj[key],options)
+            obj[key] = deepStatistics(obj[key],options)
         })
     }
+    return obj
 }
