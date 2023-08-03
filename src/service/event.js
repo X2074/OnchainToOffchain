@@ -58,6 +58,7 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
 
     // 确认下每个要分组的数据的所有取值情况
     events.forEach(event => {
+        logger.info(event)
         groups.forEach(group => {
             const keyList = group.split('.').reverse()
             let tmp = event
