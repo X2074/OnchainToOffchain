@@ -45,7 +45,7 @@ exports.find = async (queryCriteria, selectField, sortCriteria, page, pageSize) 
 exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime, endTime, options) => {
     // 根据options涉及的字符串得到需要使用的信息
     var selectField = Object.keys(options).join(' ') + ' time'
-    const groups = groupField.toLowerCase().split(' ').filter(item=>item!=='')
+    const groups = groupField.split(' ').filter(item=>item!=='')
     if(groups.length>0){
         selectField += ' ' + groups.join(' ')
     }
