@@ -14,7 +14,10 @@ exports.deleteEventsByAddress = async (address) => {
     const events = await Event.deleteMany({address: address.toLowerCase()})
     return events
 }
-
+exports.countByAddress = async (address) => {
+    const total = await Event.countDocuments({address: address.toLowerCase()})
+    return total
+}
 exports.findByAddress = async (address, page, pageSize) => {
     const total = await Event.countDocuments({address: address.toLowerCase()})
     const events = await Event
