@@ -2,6 +2,7 @@ const Event = require('../models/event')
 const dayjs = require('dayjs');
 const isSameOrBefore = require('dayjs/plugin/isSameOrBefore')
 const utc = require('dayjs/plugin/utc')
+const {logger} = require("../utils/log4");
 dayjs.extend(isSameOrBefore)
 dayjs.extend(utc)
 
@@ -113,6 +114,7 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
             tmpdata[key].push(tmp)
         })
     })
+    logger.info(statisticsData)
     times.forEach(time => {
         const tmpData = statisticsData[time]
         deepStatistics(tmpData, options)
@@ -166,6 +168,7 @@ function buildMultiLevelObject(list, obj) {
 }
 
 function deepStatistics(obj, options) {
+    logger.info(obj)
     if(Array.isArray(obj)){
         Object.keys(options).forEach(key => {
             // 按照操作类型进行处理
