@@ -149,21 +149,21 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
  * }
  */
 function buildMultiLevelObject(list, obj) {
-    function recursiveBuild(keys, value) {
+    function recursiveBuild(keys) {
         if (keys.length === 0) {
-            return value;
+            return new Array();
         }
 
         const key = keys.shift();
         const nestedObject = {};
         const values = obj[key];
         for (const v of values) {
-            nestedObject[v] = recursiveBuild([...keys], value);
+            nestedObject[v] = recursiveBuild([...keys]);
         }
         return nestedObject;
     }
 
-    const result = recursiveBuild([...list], new Array());
+    const result = recursiveBuild([...list]);
     return result;
 }
 
