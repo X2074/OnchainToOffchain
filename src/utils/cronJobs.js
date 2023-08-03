@@ -56,10 +56,11 @@ exports.scanContracts = async () => {
                             await contractService.update(contractRecord.address,{lastScannedBlock: Number(targetBlock)})
                             lastBlockNumber += batches
                         }
-                        const totalOnChain = await contract.getPastEvents('allEvents', {
+                        const allEvents = await contract.getPastEvents('allEvents', {
                             fromBlock: contractRecord.createdBlock - 1,
                             toBlock: currentBlockNumber
                         })
+                        const totalOnChain = allEvents.length
                         const totalOffChain = await eventService.countByAddress(contractRecord.address)
                         if(totalOffChain === totalOnChain){
                             verified = true
