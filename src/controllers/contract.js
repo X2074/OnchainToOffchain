@@ -65,7 +65,8 @@ class ContractCtl {
                     createdHash,
                     createdBy,
                     createdTime,
-                    createdBlock: Number(transaction.blockNumber)
+                    createdBlock: Number(transaction.blockNumber),
+                    lastScannedBlock: Number(transaction.blockNumber)-1
                 };
                 // 保存合约信息到数据库
                 const contract = await contractService.addContract(contractData)
