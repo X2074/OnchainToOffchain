@@ -28,7 +28,7 @@ exports.scanContracts = async () => {
                     var lastBlockNumber = contractRecord.lastScannedBlock
                     //增加获取数据后的校验
                     var verified = false
-                    while(!verifide){
+                    while(!verified){
                         while (lastBlockNumber < currentBlockNumber) {
                             const targetBlock = lastBlockNumber + batches < currentBlockNumber ? lastBlockNumber + batches : currentBlockNumber
                             const newEvents = await contract.getPastEvents('allEvents', {
