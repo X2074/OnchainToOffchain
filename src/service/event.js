@@ -62,6 +62,7 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
         groups.forEach(group => {
             const keyList = group.split('.').reverse()
             let tmp = event
+            logger.info(keyList)
             while (keyList.length > 0) {
                 logger.info(tmp)
                 tmp = tmp[keyList.pop()]
