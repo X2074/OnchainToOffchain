@@ -65,7 +65,7 @@ exports.scanContracts = async () => {
                         if(totalOffChain === totalOnChain){
                             verified = true
                         }else{
-                            logger.warn(`totalOnChain: ${totalOnChain}, totalOffChain: ${totalOffChain}, ${contractRecord.name}合约事件记录验证未通过，清除所有数据，重新扫描`)
+                            logger.warn(`totalOnChain: ${totalOnChain}, totalOffChain: ${totalOffChain}, ${contractRecord.address}合约事件记录验证未通过，清除所有数据，重新扫描`)
                             //验证未通过，清除所有数据，重新扫描
                             await eventService.deleteEventsByAddress(contractRecord.address)
                             await contractService.update(contractRecord.address,{lastScannedBlock: contractRecord.createdBlock - 1})
@@ -78,7 +78,7 @@ exports.scanContracts = async () => {
                     //更新合约状态
                     await contractService.update(contractRecord.address,{scanning: false})
                 }
-                logger.info(`————${contractRecord.name}合约事件记录完成 ${new Date()}————`)
+                logger.info(`————${contractRecord.address}合约事件记录完成 ${new Date()}————`)
             })
             await Promise.all(promises)
             logger.info(`————所有合约事件记录完成 ${new Date()}————`)
