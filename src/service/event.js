@@ -58,13 +58,10 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
 
     // 确认下每个要分组的数据的所有取值情况
     events.forEach(event => {
-        logger.info(event)
         groups.forEach(group => {
             const keyList = group.split('.').reverse()
             let tmp = event
-            logger.info(keyList)
             while (keyList.length > 0) {
-                logger.info(tmp)
                 tmp = tmp[keyList.pop()]
             }
             if(groupFields[group].indexOf(tmp)<0){
@@ -92,7 +89,6 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
     times.forEach(time => {
         statisticsData[time] =  buildMultiLevelObject([...groups, 'options'], {...groupFields, options: Object.keys(options)});
     })
-    logger.info(statisticsData)
     events.forEach(event => {
         const time = unit === 'all' ? 'all' : unit === 'hour' ? dayjs(event.time).utc().format('YYYY-MM-DD HH:00:00') : dayjs(event.time).utc().format('YYYY-MM-DD')
         const keyList = []
@@ -118,7 +114,6 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
             tmpdata[key].push(tmp)
         })
     })
-    logger.info(statisticsData)
     times.forEach(time => {
         statisticsData[time] = deepStatistics(statisticsData[time], options)
     })
@@ -187,7 +182,7 @@ function deepStatistics(obj, options) {
                 case 'average'://求均值
                     obj[key] = (obj[key].reduce((accumulator, current) => {
                         return accumulator + BigInt(current);
-                    }, 0n) / BigInt(list.length)).toString();
+                    }, 0n) / BigInt(obj[key].length)).toString();
                     break;
                 case 'min'://求最小值
                     obj[key] = obj[key].reduce((accumulator, current) => {
