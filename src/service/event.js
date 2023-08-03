@@ -44,12 +44,30 @@ exports.find = async (queryCriteria, selectField, sortCriteria, page, pageSize) 
 exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime, endTime, options) => {
     // 根据options涉及的字符串得到需要使用的信息
     var selectField = Object.keys(options).join(' ') + ' time'
-    const groups = groupField.split(' ').filter(item=>item!=='')
+    const groups = groupField.toLowerCase().split(' ').filter(item=>item!=='')
     if(groups.length>0){
         selectField += ' ' + groups.join(' ')
     }
+    const groupFields = {}
+    groups.forEach(group => {
+        groupFields[group] = []
+    })
     // 通过queryCriteria与selectField获取到待统计的数据
     const events = await Event.find(queryCriteria).select(selectField).exec();
+
+    // 确认下每个要分组的数据的所有取值情况
+    events.forEach(event => {
+        groups.forEach(group => {
+            const keyList = group.split('.').reverse()
+            let tmp = event
+            while (keyList.length > 0) {
+                tmp = tmp[keyList.pop()]
+            }
+            if(groupFields[group].indexOf(tmp)<0){
+                groupFields[group].push(tmp)
+            }
+        })
+    })
     const times = []
     if(unit === 'all'){
         times.push('all')
@@ -65,116 +83,39 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
             currentTime = currentTime.add(1, unit)
         }
     }
-    // 将原始记录按照时间分片统计
+    // 将原始记录按照时间和分组条件分片统计
     const statisticsData = {}
     times.forEach(time => {
-        statisticsData[time] = {}
-        if(groups.length>0){
-            groups.forEach(group => {
-                statisticsData[time][group] = {}
-                Object.keys(options).forEach(key => {
-                    statisticsData[time][group][key] = []
-                })
-            })
-        }else{
-            Object.keys(options).forEach(key => {
-                statisticsData[time][key] = []
-            })
-        }
-
+        statisticsData[time] =  buildMultiLevelObject([...groups, 'options'], {...groupFields, options: Object.keys(options)});
     })
     events.forEach(event => {
         const time = unit === 'all' ? 'all' : unit === 'hour' ? dayjs(event.time).utc().format('YYYY-MM-DD HH:00:00') : dayjs(event.time).utc().format('YYYY-MM-DD')
-        if(groups.length>0){
-            groups.forEach(group => {
-                Object.keys(options).forEach(key => {
-                    const keyList = key.split('.').reverse()
-                    let tmp = event
-                    while (keyList.length > 0) {
-                        tmp = tmp[keyList.pop()]
-                    }
-                    statisticsData[time][group][key].push(tmp)
-                })
-            })
-        }else{
-            Object.keys(options).forEach(key => {
-                const keyList = key.split('.').reverse()
-                let tmp = event
-                while (keyList.length > 0) {
-                    tmp = tmp[keyList.pop()]
-                }
-                statisticsData[time][key].push(tmp)
-            })
+        const keyList = []
+        for(let i=0; i<groups.length; i++){
+            const keys = groups[i].split('.').reverse()
+            let tmp = event
+            while (keys.length > 0) {
+                tmp = tmp[keys.pop()]
+            }
+            keyList.push(tmp)
         }
+        let tmpdata = statisticsData[time]
+        const keyListReverse = keyList.reverse()
+        while(keyListReverse.length > 0){
+            tmpdata = tmpdata[keyListReverse.pop()]
+        }
+        Object.keys(options).forEach(key => {
+            const keyList = key.split('.').reverse()
+            let tmp = event
+            while (keyList.length > 0) {
+                tmp = tmp[keyList.pop()]
+            }
+            tmpdata[key].push(tmp)
+        })
     })
     times.forEach(time => {
-        if(groups.length>0){
-            groups.forEach(group => {
-                Object.keys(options).forEach(key => {
-                    const tmpData = statisticsData[time][group][key]
-                    // 按照操作类型进行处理
-                    switch (options[key]) {
-                        case 'count'://去重计数
-                            statisticsData[time][group][key] = tmpData.reduce((accumulator, value) => {
-                                return accumulator.includes(value) ? accumulator : [...accumulator, value];
-                            }, []).length;
-                            break;
-                        case 'sum'://求和
-                            statisticsData[time][group][key] = tmpData.reduce((accumulator, current) => {
-                                return accumulator + BigInt(current);
-                            }, 0n).toString();
-                            break;
-                        case 'average'://求均值
-                            statisticsData[time][group][key] = (tmpData.reduce((accumulator, current) => {
-                                return accumulator + BigInt(current);
-                            }, 0n) / BigInt(tmpData.length)).toString();
-                            break;
-                        case 'min'://求最小值
-                            statisticsData[time][group][key] = tmpData.reduce((accumulator, current) => {
-                                return accumulator < BigInt(current) ? accumulator : BigInt(current);
-                            }, 0n).toString();
-                            break;
-                        case 'max'://求最大值
-                            statisticsData[time][group][key] = tmpData.reduce((accumulator, current) => {
-                                return accumulator > BigInt(current) ? accumulator : BigInt(current);
-                            }, 0n).toString();
-                            break;
-                    }
-                })
-            })
-        }else{
-            Object.keys(options).forEach(key => {
-                const tmpData = statisticsData[time][key]
-                // 按照操作类型进行处理
-                switch (options[key]) {
-                    case 'count'://去重计数
-                        statisticsData[time][key] = tmpData.reduce((accumulator, value) => {
-                            return accumulator.includes(value) ? accumulator : [...accumulator, value];
-                        }, []).length;
-                        break;
-                    case 'sum'://求和
-                        statisticsData[time][key] = tmpData.reduce((accumulator, current) => {
-                            return accumulator + BigInt(current);
-                        }, 0n).toString();
-                        break;
-                    case 'average'://求均值
-                        statisticsData[time][key] = (tmpData.reduce((accumulator, current) => {
-                            return accumulator + BigInt(current);
-                        }, 0n) / BigInt(tmpData.length)).toString();
-                        break;
-                    case 'min'://求最小值
-                        statisticsData[time][key] = tmpData.reduce((accumulator, current) => {
-                            return accumulator < BigInt(current) ? accumulator : BigInt(current);
-                        }, 0n).toString();
-                        break;
-                    case 'max'://求最大值
-                        statisticsData[time][key] = tmpData.reduce((accumulator, current) => {
-                            return accumulator > BigInt(current) ? accumulator : BigInt(current);
-                        }, 0n).toString();
-                        break;
-                }
-            })
-        }
+        const tmpData = statisticsData[time]
+        deepStatistics(tmpData, options)
     })
     // 转换为数组格式
     const result = []
@@ -183,3 +124,86 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
     })
     return result
 };
+
+/**
+ * 构建多级对象
+ * @param list 分组字段 例如：["a", "b", "c", "d"]
+ * @param obj 分组值 例如：{
+ *     "a": ["a1", "a2"],
+ *     "b": ["b1", "b2"],
+ *     "c": ["c1", "c2", "c3"],
+ *     "d": ["d1"]
+ * }
+ * @return {*|{}}
+ * 例如：{
+ *     a1: {
+ *         b1: {c1: {d1: []}, c2: {d1: []}, c3: {d1: []}},
+ *         b2: {c1: {d1: []}, c2: {d1: []}, c3: {d1: []}}
+ *     },
+ *     a2: {
+ *         b1: {c1: {d1: []}, c2: {d1: []}, c3: {d1: []}},
+ *         b2: {c1: {d1: []}, c2: {d1: []}, c3: {d1: []}}
+ *     }
+ * }
+ */
+function buildMultiLevelObject(list, obj) {
+    function recursiveBuild(keys, value) {
+        if (keys.length === 0) {
+            return value;
+        }
+
+        const key = keys.shift();
+        const nestedObject = {};
+        const values = obj[key];
+        for (const v of values) {
+            nestedObject[v] = recursiveBuild([...keys], value);
+        }
+        return nestedObject;
+    }
+
+    const result = recursiveBuild([...list], []);
+    return result;
+}
+
+function deepStatistics(obj, options) {
+    if(Array.isArray(obj)){
+        Object.keys(options).forEach(key => {
+            // 按照操作类型进行处理
+            switch (options[key]) {
+                case 'count'://去重计数
+                    obj = obj.reduce((accumulator, value) => {
+                        return accumulator.includes(value) ? accumulator : [...accumulator, value];
+                    }, []).length;
+                    break;
+                case 'sum'://求和
+                    obj = obj.reduce((accumulator, current) => {
+                        current = current ? current : 0n
+                        return accumulator + BigInt(current);
+                    }, 0n).toString();
+                    break;
+                case 'average'://求均值
+                    obj = (obj.reduce((accumulator, current) => {
+                        current = current ? current : 0n
+                        return accumulator + BigInt(current);
+                    }, 0n) / BigInt(obj.length)).toString();
+                    break;
+                case 'min'://求最小值
+                    obj = obj.reduce((accumulator, current) => {
+                        current = current ? current : 0n
+                        return accumulator < BigInt(current) ? accumulator : BigInt(current);
+                    }, 0n).toString();
+                    break;
+                case 'max'://求最大值
+                    obj = obj.reduce((accumulator, current) => {
+                        current = current ? current : 0n
+                        return accumulator > BigInt(current) ? accumulator : BigInt(current);
+                    }, 0n).toString();
+                    break;
+            }
+        })
+    }else{
+        Object.keys(obj).forEach(key=>{
+            deepStatistics(obj[key],options)
+        })
+    }
+}
