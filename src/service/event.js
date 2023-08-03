@@ -107,10 +107,10 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
             tmpdata = tmpdata[keyListReverse.pop()]
         }
         Object.keys(options).forEach(key => {
-            const keyList = key.split('.').reverse()
+            const keyList2 = key.split('.').reverse()
             let tmp = event
-            while (keyList.length > 0) {
-                tmp = tmp[keyList.pop()]
+            while (keyList2.length > 0) {
+                tmp = tmp[keyList2.pop()]
             }
             tmpdata[key].push(tmp)
         })
@@ -163,7 +163,7 @@ function buildMultiLevelObject(list, obj) {
         return nestedObject;
     }
 
-    const result = recursiveBuild([...list], []);
+    const result = recursiveBuild([...list], new Array());
     return result;
 }
 
