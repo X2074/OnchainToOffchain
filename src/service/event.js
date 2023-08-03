@@ -168,43 +168,38 @@ function buildMultiLevelObject(list, obj) {
 }
 
 function deepStatistics(obj, options) {
-    if(Array.isArray(obj)){
-        logger.info(obj)
-        Object.keys(options).forEach(key => {
-            const list = [].push(...obj)
-            // 按照操作类型进行处理
+    Object.keys(obj).forEach(key=>{
+        if(Array.isArray(obj[key])){
             switch (options[key]) {
                 case 'count'://去重计数
-                    obj = list.reduce((accumulator, value) => {
+                    obj[key] = obj[key].reduce((accumulator, value) => {
                         return accumulator.includes(value) ? accumulator : [...accumulator, value];
                     }, []).length;
                     break;
                 case 'sum'://求和
-                    obj = list.reduce((accumulator, current) => {
+                    obj[key] = obj[key].reduce((accumulator, current) => {
                         return accumulator + BigInt(current);
                     }, 0n).toString();
                     break;
                 case 'average'://求均值
-                    obj = (list.reduce((accumulator, current) => {
+                    obj[key] = (obj[key].reduce((accumulator, current) => {
                         return accumulator + BigInt(current);
                     }, 0n) / BigInt(list.length)).toString();
                     break;
                 case 'min'://求最小值
-                    obj = list.reduce((accumulator, current) => {
+                    obj[key] = obj[key].reduce((accumulator, current) => {
                         return accumulator < BigInt(current) ? accumulator : BigInt(current);
                     }, 0n).toString();
                     break;
                 case 'max'://求最大值
-                    obj = list.reduce((accumulator, current) => {
+                    obj[key] = obj[key].reduce((accumulator, current) => {
                         return accumulator > BigInt(current) ? accumulator : BigInt(current);
                     }, 0n).toString();
                     break;
             }
-        })
-    }else{
-        Object.keys(obj).forEach(key=>{
+        }else {
             obj[key] = deepStatistics(obj[key],options)
-        })
-    }
+        }
+    })
     return obj
 }
