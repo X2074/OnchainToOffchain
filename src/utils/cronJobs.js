@@ -22,7 +22,7 @@ exports.scanContracts = async () => {
                 }
                 const contract = await new web3.eth.Contract(contractRecord.abi, contractRecord.address)
                 //分批次获取事件
-                var lastBlockNumber = contractRecord.createdBlock ? contractRecord.createdBlock : contractRecord.lastScannedBlock
+                var lastBlockNumber = contractRecord.lastScannedBlock
                 while (lastBlockNumber < currentBlockNumber) {
                     const targetBlock = lastBlockNumber + batches < currentBlockNumber ? lastBlockNumber + batches : currentBlockNumber
                     const newEvents = await contract.getPastEvents('allEvents', {
@@ -37,7 +37,11 @@ exports.scanContracts = async () => {
                     }
                     //记录事件
                     const eventPromises = events.map(async (event) => {
-                        await eventService.addEvent(event)
+                        try{
+                            await eventService.addEvent(event)
+                        }catch (err){
+                            logger.error(err)
+                        }
                     })
                     await Promise.all(eventPromises)
                     //更新合约记录

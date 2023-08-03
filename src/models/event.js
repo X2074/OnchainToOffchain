@@ -8,7 +8,7 @@ const eventSchema = new Schema({
     blockNumber: {type: Number, require: true},
     blockHash: {type: String, require: true},
     time: {type: Date, require: true, index: true}, //对时间索引
-    transactionHash: {type: String, require: true},
+    transactionHash: {type: String, require: true, unique: true},
     transactionIndex: {type: Number, require: true},
     topics: {type: Array, require: true},
     data: {type: String, require: true},
