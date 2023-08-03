@@ -41,9 +41,13 @@ exports.find = async (queryCriteria, selectField, sortCriteria, page, pageSize) 
     return {total: total, events: events, page: page, pageSize: pageSize}
 }
 
-exports.getEventsStatistics = async (queryCriteria, unit, startTime, endTime, options) => {
+exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime, endTime, options) => {
     // 根据options涉及的字符串得到需要使用的信息
-    const selectField = Object.keys(options).join(' ') + ' time'
+    var selectField = Object.keys(options).join(' ') + ' time'
+    const groups = groupField.split(' ')
+    if(groups.length()>0){
+        selectField += ' ' + groups.join(' ')
+    }
     // 通过queryCriteria与selectField获取到待统计的数据
     const events = await Event.find(queryCriteria).select(selectField).exec();
     const times = []
@@ -65,53 +69,112 @@ exports.getEventsStatistics = async (queryCriteria, unit, startTime, endTime, op
     const statisticsData = {}
     times.forEach(time => {
         statisticsData[time] = {}
-        Object.keys(options).forEach(key => {
-            statisticsData[time][key] = []
-        })
+        if(groups.length()>0){
+            groups.forEach(group => {
+                statisticsData[time][group] = {}
+                Object.keys(options).forEach(key => {
+                    statisticsData[time][group][key] = []
+                })
+            })
+        }else{
+            Object.keys(options).forEach(key => {
+                statisticsData[time][key] = []
+            })
+        }
+
     })
     events.forEach(event => {
         const time = unit === 'all' ? 'all' : unit === 'hour' ? dayjs(event.time).utc().format('YYYY-MM-DD HH:00:00') : dayjs(event.time).utc().format('YYYY-MM-DD')
-        Object.keys(options).forEach(key => {
-            const keyList = key.split('.').reverse()
-            let tmp = event
-            while (keyList.length > 0) {
-                tmp = tmp[keyList.pop()]
-            }
-            statisticsData[time][key].push(tmp)
-        })
+        if(groups.length()>0){
+            groups.forEach(group => {
+                Object.keys(options).forEach(key => {
+                    const keyList = key.split('.').reverse()
+                    let tmp = event
+                    while (keyList.length > 0) {
+                        tmp = tmp[keyList.pop()]
+                    }
+                    statisticsData[time][group][key].push(tmp)
+                })
+            })
+        }else{
+            Object.keys(options).forEach(key => {
+                const keyList = key.split('.').reverse()
+                let tmp = event
+                while (keyList.length > 0) {
+                    tmp = tmp[keyList.pop()]
+                }
+                statisticsData[time][key].push(tmp)
+            })
+        }
     })
     times.forEach(time => {
-        Object.keys(options).forEach(key => {
-            const tmpData = statisticsData[time][key]
-            // 按照操作类型进行处理
-            switch (options[key]) {
-                case 'count'://去重计数
-                    statisticsData[time][key] = tmpData.reduce((accumulator, value) => {
-                        return accumulator.includes(value) ? accumulator : [...accumulator, value];
-                    }, []).length;
-                    break;
-                case 'sum'://求和
-                    statisticsData[time][key] = tmpData.reduce((accumulator, current) => {
-                        return accumulator + BigInt(current);
-                    }, 0n).toString();
-                    break;
-                case 'average'://求均值
-                    statisticsData[time][key] = (tmpData.reduce((accumulator, current) => {
-                        return accumulator + BigInt(current);
-                    }, 0n) / BigInt(tmpData.length)).toString();
-                    break;
-                case 'min'://求最小值
-                    statisticsData[time][key] = tmpData.reduce((accumulator, current) => {
-                        return accumulator < BigInt(current) ? accumulator : BigInt(current);
-                    }, 0n).toString();
-                    break;
-                case 'max'://求最大值
-                    statisticsData[time][key] = tmpData.reduce((accumulator, current) => {
-                        return accumulator > BigInt(current) ? accumulator : BigInt(current);
-                    }, 0n).toString();
-                    break;
-            }
-        })
+        if(groups.length()>0){
+            groups.forEach(group => {
+                Object.keys(options).forEach(key => {
+                    const tmpData = statisticsData[time][group][key]
+                    // 按照操作类型进行处理
+                    switch (options[key]) {
+                        case 'count'://去重计数
+                            statisticsData[time][group][key] = tmpData.reduce((accumulator, value) => {
+                                return accumulator.includes(value) ? accumulator : [...accumulator, value];
+                            }, []).length;
+                            break;
+                        case 'sum'://求和
+                            statisticsData[time][group][key] = tmpData.reduce((accumulator, current) => {
+                                return accumulator + BigInt(current);
+                            }, 0n).toString();
+                            break;
+                        case 'average'://求均值
+                            statisticsData[time][group][key] = (tmpData.reduce((accumulator, current) => {
+                                return accumulator + BigInt(current);
+                            }, 0n) / BigInt(tmpData.length)).toString();
+                            break;
+                        case 'min'://求最小值
+                            statisticsData[time][group][key] = tmpData.reduce((accumulator, current) => {
+                                return accumulator < BigInt(current) ? accumulator : BigInt(current);
+                            }, 0n).toString();
+                            break;
+                        case 'max'://求最大值
+                            statisticsData[time][group][key] = tmpData.reduce((accumulator, current) => {
+                                return accumulator > BigInt(current) ? accumulator : BigInt(current);
+                            }, 0n).toString();
+                            break;
+                    }
+                })
+            })
+        }else{
+            Object.keys(options).forEach(key => {
+                const tmpData = statisticsData[time][key]
+                // 按照操作类型进行处理
+                switch (options[key]) {
+                    case 'count'://去重计数
+                        statisticsData[time][key] = tmpData.reduce((accumulator, value) => {
+                            return accumulator.includes(value) ? accumulator : [...accumulator, value];
+                        }, []).length;
+                        break;
+                    case 'sum'://求和
+                        statisticsData[time][key] = tmpData.reduce((accumulator, current) => {
+                            return accumulator + BigInt(current);
+                        }, 0n).toString();
+                        break;
+                    case 'average'://求均值
+                        statisticsData[time][key] = (tmpData.reduce((accumulator, current) => {
+                            return accumulator + BigInt(current);
+                        }, 0n) / BigInt(tmpData.length)).toString();
+                        break;
+                    case 'min'://求最小值
+                        statisticsData[time][key] = tmpData.reduce((accumulator, current) => {
+                            return accumulator < BigInt(current) ? accumulator : BigInt(current);
+                        }, 0n).toString();
+                        break;
+                    case 'max'://求最大值
+                        statisticsData[time][key] = tmpData.reduce((accumulator, current) => {
+                            return accumulator > BigInt(current) ? accumulator : BigInt(current);
+                        }, 0n).toString();
+                        break;
+                }
+            })
+        }
     })
     // 转换为数组格式
     const result = []
