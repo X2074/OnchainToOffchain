@@ -12,7 +12,8 @@ const contractSchema = new Schema({
     createdTime: {type: Date, require: false},
     createdBlock: {type: Number, require: false},
     lastScannedBlock: {type: Number, default: 0},
-    scannable: {type: Boolean, default: true}
+    scannable: {type: Boolean, default: true},
+    scanning: {type: Boolean, default: false}
 })
 
 module.exports = model('Contract', contractSchema)
