@@ -171,30 +171,30 @@ function deepStatistics(obj, options) {
             // 按照操作类型进行处理
             switch (options[key]) {
                 case 'count'://去重计数
-                    obj = obj.reduce((accumulator, value) => {
+                    obj = Array(obj).reduce((accumulator, value) => {
                         return accumulator.includes(value) ? accumulator : [...accumulator, value];
                     }, []).length;
                     break;
                 case 'sum'://求和
-                    obj = obj.reduce((accumulator, current) => {
+                    obj = Array(obj).reduce((accumulator, current) => {
                         current = current ? current : 0n
                         return accumulator + BigInt(current);
                     }, 0n).toString();
                     break;
                 case 'average'://求均值
-                    obj = (obj.reduce((accumulator, current) => {
+                    obj = (Array(obj).reduce((accumulator, current) => {
                         current = current ? current : 0n
                         return accumulator + BigInt(current);
-                    }, 0n) / BigInt(obj.length)).toString();
+                    }, 0n) / BigInt(Array(obj).length)).toString();
                     break;
                 case 'min'://求最小值
-                    obj = obj.reduce((accumulator, current) => {
+                    obj = Array(obj).reduce((accumulator, current) => {
                         current = current ? current : 0n
                         return accumulator < BigInt(current) ? accumulator : BigInt(current);
                     }, 0n).toString();
                     break;
                 case 'max'://求最大值
-                    obj = obj.reduce((accumulator, current) => {
+                    obj = Array(obj).reduce((accumulator, current) => {
                         current = current ? current : 0n
                         return accumulator > BigInt(current) ? accumulator : BigInt(current);
                     }, 0n).toString();
