@@ -1,11 +1,13 @@
 const contractService = require('../service/contract')
 const eventService = require('../service/event')
 const transactionService = require('../service/transaction')
+const blockService = require('../service/block')
 const Web3 = require('web3').Web3
 const { rpc, batches } = require('../config')
-const { formatEvents, formatTransactions } = require('../utils/format')
+const { formatEvents, formatTransactions, formatBlock } = require('../utils/format')
 const {logger} = require("./log4");
 const cache = require("./cache")
+const {addBlocks} = require("../service/block");
 /**
  * 定期获取合约事件
  */
@@ -108,33 +110,40 @@ exports.scanTransactions = async () => {
             blockScanning=true
             cache.set('blockScanning',blockScanning)
             let transactions = [];
+            let blocks = [];
             const httpProvider = new Web3.providers.HttpProvider(rpc);
             const web3 = new Web3(httpProvider);
             // const currentBlockNumber = Number(await web3.eth.getBlockNumber())
             const currentBlockNumber = 1000
             if(currentBlockNumber>lastScannedBlockNumber){
                 logger.info(`————开始扫描区块交易 ${new Date()}————`)
+                await blockService.dropIndexes()
                 await transactionService.dropIndexes()
                 try{
                     for (let i = lastScannedBlockNumber===null? 0 : lastScannedBlockNumber+1; i <= currentBlockNumber; i++) {
                         const block = await web3.eth.getBlock(i, true);
+                        blocks.push(formatBlock(block))
                         for (const transaction of formatTransactions(block)) {
                             transactions.push(transaction)
                         }
                         if(transactions.length>10){
+                            await blockService.addBlocks(blocks)
                             await transactionService.addTransactions(transactions)
+                            blocks = []
                             transactions = []
                             cache.set('lastScannedBlockNumber',i)
                             logger.info(`****完成区块${i}数据录入 ${new Date()}****`)
                         }
                     }
                     if(transactions.length>0){
+                        await blockService.addBlocks(blocks)
                         await transactionService.addTransactions(transactions)
                         cache.set('lastScannedBlockNumber',currentBlockNumber)
                     }
                 }catch (err){
                     logger.error(err)
                 }
+                await blockService.createIndexes()
                 await transactionService.createIndexes()
                 logger.info(`————完成区块交易扫描，最新区块：${currentBlockNumber} ${new Date()}————`)
             }

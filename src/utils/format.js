@@ -61,3 +61,29 @@ exports.formatTransactions= (block) => {
         return []
     }
 }
+/**
+ * 格式化Block
+ */
+exports.formatBlock= (block) => {
+        return {
+            hash: block.hash,
+            number: Number(block.number),
+            time: new Date(Number(block.timestamp) * 1000), // 将Unix时间戳转换为Date对象
+            timestamp: Number(block.timestamp),
+            difficulty: block.difficulty,
+            extraData: block.extraData,
+            gasLimit: block.gasLimit.toString(),
+            gasUsed: block.gasUsed.toString(),
+            logsBloom: block.logsBloom,
+            miner: block.miner,
+            mixHash: block.mixHash,
+            nonce: block.nonce.toString(),
+            parentHash: block.parentHash,
+            sha3Uncles: block.sha3Uncles,
+            size: Number(block.size),
+            stateRoot: block.stateRoot,
+            totalDifficulty: block.totalDifficulty,
+            transactionsRoot: block.transactionsRoot,
+            uncles: block.uncles
+        }
+}
