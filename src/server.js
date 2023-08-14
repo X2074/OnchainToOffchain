@@ -8,7 +8,7 @@ const mongoose = require('mongoose')
 const routing = require('./routes')
 const {accessLogger, logger,} = require('./utils/log4')
 const CronJob = require('cron').CronJob;
-const {scanContracts} = require('./utils/cronJobs')
+const {scanContractsEvents, scanTransactions} = require('./utils/cronJobs')
 const {program} = require('commander');
 const fs = require('fs')
 // 接收命令行参数来决定是否清空文档集合
@@ -64,9 +64,14 @@ async function startServer() {
      * 定期获取合约事件 5分钟执行一次
      */
     new CronJob('0 */5 * * * *', function () {
-        scanContracts()
+        scanContractsEvents()
     }, null, true)
-
+    /**
+     * 定期获取交易记录 5分钟执行一次
+     */
+    new CronJob('0 */5 * * * *', function () {
+        scanTransactions()
+    }, null, true)
     // 记录访问日志
     app.use(accessLogger())
     // 记录失败日志

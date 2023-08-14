@@ -1,5 +1,5 @@
 {
-  "name": "onchaintooffchain",
+  "name": "onchain_to_offchain",
   "version": "1.0.0",
   "description": "OnchainToOffchain: A blockchain oriented data synchronization tool that synchronizes on chain transaction data to offline databases, facilitating further development of complex business scenarios.",
   "main": "src/server.js",
@@ -30,6 +30,7 @@
     "koa-parameter": "^3.0.1",
     "koa-router": "^12.0.0",
     "mongoose": "^7.4.1",
+    "node-cache": "^5.1.2",
     "web3": "^4.0.3"
   },
   "devDependencies": {

@@ -2,7 +2,6 @@ const Web3 = require('web3').Web3
 const { rpc } = require('../config')
 /**
  * 查询事件时间戳，格式化events
- * @param events
  */
 exports.formatEvents = async (events) => {
     const httpProvider = new Web3.providers.HttpProvider(rpc);
@@ -31,4 +30,34 @@ exports.formatEvents = async (events) => {
         promises.push(promise)
     }
     return await Promise.all(promises)
+}
+/**
+ * 查询区块时间戳，格式化Transactions
+ */
+exports.formatTransactions= (block) => {
+    if(block.transactions){
+        return block.transactions.map(transaction=>{
+            return {
+                hash: transaction.hash,
+                blockHash: transaction.blockHash,
+                blockNumber: Number(transaction.blockNumber),
+                time: new Date(Number(block.timestamp) * 1000), // 将Unix时间戳转换为Date对象
+                from: transaction.from,
+                gas: transaction.gas.toString(),
+                gasPrice: transaction.gasPrice.toString(),
+                input: transaction.input,
+                nonce: transaction.nonce.toString(),
+                to: transaction.to,
+                transactionIndex: Number(transaction.transactionIndex),
+                value: transaction.value.toString(),
+                type: transaction.type.toString(),
+                chainId: Number(transaction.chainId),
+                v: transaction.v.toString(),
+                r: transaction.r.toString(),
+                s: transaction.s.toString()
+            }
+        })
+    }else {
+        return []
+    }
 }

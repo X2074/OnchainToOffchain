@@ -1,13 +1,15 @@
 const contractService = require('../service/contract')
 const eventService = require('../service/event')
+const transactionService = require('../service/transaction')
 const Web3 = require('web3').Web3
 const { rpc, batches } = require('../config')
-const { formatEvents } = require('../utils/format')
+const { formatEvents, formatTransactions } = require('../utils/format')
 const {logger} = require("./log4");
+const cache = require("./cache")
 /**
- * 定期获取合约事件 5分钟执行一次
+ * 定期获取合约事件
  */
-exports.scanContracts = async () => {
+exports.scanContractsEvents = async () => {
     try{
         const contracts = await contractService.findAllDetail({scannable: true},'address createdBlock lastScannedBlock scannable abi')
         if(contracts.length>0){
@@ -83,6 +85,63 @@ exports.scanContracts = async () => {
             await Promise.all(promises)
             logger.info(`————所有合约事件记录完成 ${new Date()}————`)
         }
+    }catch (err){
+        logger.error(err)
+    }
+}
+/**
+ * 定期获取区块中的交易记录
+ */
+exports.scanTransactions = async () => {
+    try{
+        let lastScannedBlockNumber = cache.get('lastScannedBlockNumber');
+        if(lastScannedBlockNumber===undefined){
+            lastScannedBlockNumber= await transactionService.findLastBlockNumber()
+            cache.set('lastScannedBlockNumber',lastScannedBlockNumber)
+        }
+        let blockScanning = cache.get('blockScanning');
+        if(blockScanning===undefined) {
+            blockScanning = false
+            cache.set('blockScanning', blockScanning)
+        }
+        if(blockScanning===false){
+            blockScanning=true
+            cache.set('blockScanning',blockScanning)
+            let transactions = [];
+            const httpProvider = new Web3.providers.HttpProvider(rpc);
+            const web3 = new Web3(httpProvider);
+            // const currentBlockNumber = Number(await web3.eth.getBlockNumber())
+            const currentBlockNumber = 1000
+            if(currentBlockNumber>lastScannedBlockNumber){
+                logger.info(`————开始扫描区块交易 ${new Date()}————`)
+                await transactionService.dropIndexes()
+                try{
+                    for (let i = lastScannedBlockNumber===null? 0 : lastScannedBlockNumber+1; i <= currentBlockNumber; i++) {
+                        const block = await web3.eth.getBlock(i, true);
+                        for (const transaction of formatTransactions(block)) {
+                            transactions.push(transaction)
+                        }
+                        if(transactions.length>10){
+                            await transactionService.addTransactions(transactions)
+                            transactions = []
+                            cache.set('lastScannedBlockNumber',i)
+                            logger.info(`****完成区块${i}数据录入 ${new Date()}****`)
+                        }
+                    }
+                    if(transactions.length>0){
+                        await transactionService.addTransactions(transactions)
+                        cache.set('lastScannedBlockNumber',currentBlockNumber)
+                    }
+                }catch (err){
+                    logger.error(err)
+                }
+                await transactionService.createIndexes()
+                logger.info(`————完成区块交易扫描，最新区块：${currentBlockNumber} ${new Date()}————`)
+            }
+            blockScanning=false
+            cache.set('blockScanning',blockScanning)
+        }
+
     }catch (err){
         logger.error(err)
     }
