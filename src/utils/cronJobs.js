@@ -3,7 +3,7 @@ const eventService = require('../service/event')
 const transactionService = require('../service/transaction')
 const blockService = require('../service/block')
 const Web3 = require('web3').Web3
-const { rpc, batches } = require('../config')
+const { rpc, block_batches, bulk_save_batches } = require('../config')
 const { formatEvents, formatTransactions, formatBlock } = require('../utils/format')
 const {logger} = require("./log4");
 const cache = require("./cache")
@@ -34,7 +34,7 @@ exports.scanContractsEvents = async () => {
                     var verified = false
                     while(!verified){
                         while (lastBlockNumber < currentBlockNumber) {
-                            const targetBlock = lastBlockNumber + batches < currentBlockNumber ? lastBlockNumber + batches : currentBlockNumber
+                            const targetBlock = lastBlockNumber + block_batches < currentBlockNumber ? lastBlockNumber + block_batches : currentBlockNumber
                             const newEvents = await contract.getPastEvents('allEvents', {
                                 fromBlock: lastBlockNumber === 0 ? lastBlockNumber : lastBlockNumber + 1,
                                 toBlock: targetBlock
@@ -58,7 +58,7 @@ exports.scanContractsEvents = async () => {
                             await Promise.all(eventPromises)
                             //更新合约记录
                             await contractService.update(contractRecord.address,{lastScannedBlock: Number(targetBlock)})
-                            lastBlockNumber += batches
+                            lastBlockNumber += block_batches
                         }
                         const allEvents = await contract.getPastEvents('allEvents', {
                             fromBlock: contractRecord.createdBlock - 1,
@@ -113,8 +113,8 @@ exports.scanTransactions = async () => {
             let blocks = [];
             const httpProvider = new Web3.providers.HttpProvider(rpc);
             const web3 = new Web3(httpProvider);
-            // const currentBlockNumber = Number(await web3.eth.getBlockNumber())
-            const currentBlockNumber = 1000
+            const currentBlockNumber = Number(await web3.eth.getBlockNumber())
+            // const currentBlockNumber = 1000
             if(currentBlockNumber>lastScannedBlockNumber){
                 logger.info(`————开始扫描区块交易 ${new Date()}————`)
                 await blockService.dropIndexes()
@@ -126,7 +126,7 @@ exports.scanTransactions = async () => {
                         for (const transaction of formatTransactions(block)) {
                             transactions.push(transaction)
                         }
-                        if(transactions.length>10){
+                        if(transactions.length>bulk_save_batches){
                             await blockService.addBlocks(blocks)
                             await transactionService.addTransactions(transactions)
                             blocks = []
