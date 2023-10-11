@@ -2,9 +2,10 @@ const Event = require('../models/event')
 const dayjs = require('dayjs');
 const isSameOrBefore = require('dayjs/plugin/isSameOrBefore')
 const utc = require('dayjs/plugin/utc')
-const {logger} = require("../utils/log4");
+const quarterOfYear = require('dayjs/plugin/quarterOfYear')
 dayjs.extend(isSameOrBefore)
 dayjs.extend(utc)
+dayjs.extend(quarterOfYear)
 
 exports.addEvent = async (eventData) => {
     eventData.address = eventData.address.toLowerCase()
@@ -84,7 +85,7 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
                     times.push(currentTime.format('YYYY-MM-DD'));
                     break;
                 case 'week':
-                    times.push(currentTime.format('YYYY') + '-W' + currentTime.format('WW')); // 表示年份和该年中的周数，例如 "2023-W15"
+                    times.push(currentTime.format('YYYY') + '-W' + currentTime.format('ww')); // 表示年份和该年中的周数，例如 "2023-W15"
                     break;
                 case 'month':
                     times.push(currentTime.format('YYYY-MM'));
@@ -122,7 +123,7 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
                 time = dayjs(event.time).utc().format('YYYY-MM-DD');
                 break;
             case 'week':
-                time = dayjs(event.time).utc().format('YYYY') + '-W' + dayjs(event.time).utc().format('WW');  // 使用 "YYYY-Www" 格式
+                time = dayjs(event.time).utc().format('YYYY') + '-W' + dayjs(event.time).utc().format('ww');  // 使用 "YYYY-Www" 格式
                 break;
             case 'month':
                 time = dayjs(event.time).utc().format('YYYY-MM');
