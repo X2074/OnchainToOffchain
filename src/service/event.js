@@ -3,9 +3,11 @@ const dayjs = require('dayjs');
 const isSameOrBefore = require('dayjs/plugin/isSameOrBefore')
 const utc = require('dayjs/plugin/utc')
 const quarterOfYear = require('dayjs/plugin/quarterOfYear')
+const weekOfYear = require('dayjs/plugin/weekOfYear')
 dayjs.extend(isSameOrBefore)
 dayjs.extend(utc)
 dayjs.extend(quarterOfYear)
+dayjs.extend(weekOfYear)
 
 exports.addEvent = async (eventData) => {
     eventData.address = eventData.address.toLowerCase()
@@ -85,7 +87,7 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
                     times.push(currentTime.format('YYYY-MM-DD'));
                     break;
                 case 'week':
-                    times.push(currentTime.format('YYYY') + '-W' + currentTime.format('ww')); // 表示年份和该年中的周数，例如 "2023-W15"
+                    times.push(currentTime.format('YYYY') + '-W' + String(dayjs(event.time).utc().week()).padStart(2, '0')); // 表示年份和该年中的周数，例如 "2023-W15"
                     break;
                 case 'month':
                     times.push(currentTime.format('YYYY-MM'));
@@ -110,7 +112,6 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
         statisticsData[time] =  buildMultiLevelObject([...groups, 'options'], {...groupFields, options: Object.keys(options)});
     })
     events.forEach(event => {
-        // const time = unit === 'all' ? 'all' : unit === 'hour' ? dayjs(event.time).utc().format('YYYY-MM-DD HH:00:00') : dayjs(event.time).utc().format('YYYY-MM-DD')
         let time;
         switch (unit) {
             case 'all':
@@ -123,7 +124,7 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
                 time = dayjs(event.time).utc().format('YYYY-MM-DD');
                 break;
             case 'week':
-                time = dayjs(event.time).utc().format('YYYY') + '-W' + dayjs(event.time).utc().format('ww');  // 使用 "YYYY-Www" 格式
+                time = dayjs(event.time).utc().format('YYYY') + '-W' + String(dayjs(event.time).utc().week()).padStart(2, '0');
                 break;
             case 'month':
                 time = dayjs(event.time).utc().format('YYYY-MM');
