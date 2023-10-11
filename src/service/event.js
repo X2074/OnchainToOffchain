@@ -87,7 +87,7 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
                     times.push(currentTime.format('YYYY-MM-DD'));
                     break;
                 case 'week':
-                    times.push(currentTime.format('YYYY') + '-W' + String(dayjs(event.time).utc().week()).padStart(2, '0')); // 表示年份和该年中的周数，例如 "2023-W15"
+                    times.push(currentTime.format('YYYY') + '-W' + String(currentTime.week()).padStart(2, '0')); // 表示年份和该年中的周数，例如 "2023-W15"
                     break;
                 case 'month':
                     times.push(currentTime.format('YYYY-MM'));
