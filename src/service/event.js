@@ -2,9 +2,12 @@ const Event = require('../models/event')
 const dayjs = require('dayjs');
 const isSameOrBefore = require('dayjs/plugin/isSameOrBefore')
 const utc = require('dayjs/plugin/utc')
-const {logger} = require("../utils/log4");
+const quarterOfYear = require('dayjs/plugin/quarterOfYear')
+const weekOfYear = require('dayjs/plugin/weekOfYear')
 dayjs.extend(isSameOrBefore)
 dayjs.extend(utc)
+dayjs.extend(quarterOfYear)
+dayjs.extend(weekOfYear)
 
 exports.addEvent = async (eventData) => {
     eventData.address = eventData.address.toLowerCase()
@@ -76,10 +79,29 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
         let currentTime = dayjs(startTime).utc().startOf(unit)
         const lastTime = dayjs(endTime).utc().startOf(unit)
         while (currentTime.isSameOrBefore(lastTime)) {
-            if (unit === 'hour') {
-                times.push(currentTime.format('YYYY-MM-DD HH:00:00'))
-            } else {
-                times.push(currentTime.format('YYYY-MM-DD'))
+            switch(unit) {
+                case 'hour':
+                    times.push(currentTime.format('YYYY-MM-DD HH:00:00'));
+                    break;
+                case 'day':
+                    times.push(currentTime.format('YYYY-MM-DD'));
+                    break;
+                case 'week':
+                    times.push(currentTime.format('YYYY') + '-W' + String(currentTime.week()).padStart(2, '0')); // 表示年份和该年中的周数，例如 "2023-W15"
+                    break;
+                case 'month':
+                    times.push(currentTime.format('YYYY-MM'));
+                    break;
+                case 'quarter':
+                    times.push(currentTime.format('YYYY') + '-Q' + currentTime.quarter()); // 表示年份和季度
+                    break;
+                case 'year':
+                    times.push(currentTime.format('YYYY'));
+                    break;
+                default: // 默认按天处理
+                    times.push(currentTime.format('YYYY-MM-DD'));
+                    break;
+
             }
             currentTime = currentTime.add(1, unit)
         }
@@ -90,7 +112,33 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
         statisticsData[time] =  buildMultiLevelObject([...groups, 'options'], {...groupFields, options: Object.keys(options)});
     })
     events.forEach(event => {
-        const time = unit === 'all' ? 'all' : unit === 'hour' ? dayjs(event.time).utc().format('YYYY-MM-DD HH:00:00') : dayjs(event.time).utc().format('YYYY-MM-DD')
+        let time;
+        switch (unit) {
+            case 'all':
+                time = 'all';
+                break;
+            case 'hour':
+                time = dayjs(event.time).utc().format('YYYY-MM-DD HH:00:00');
+                break;
+            case 'day':
+                time = dayjs(event.time).utc().format('YYYY-MM-DD');
+                break;
+            case 'week':
+                time = dayjs(event.time).utc().format('YYYY') + '-W' + String(dayjs(event.time).utc().week()).padStart(2, '0');
+                break;
+            case 'month':
+                time = dayjs(event.time).utc().format('YYYY-MM');
+                break;
+            case 'quarter':
+                time = dayjs(event.time).utc().format('YYYY') + '-Q' + dayjs(event.time).utc().quarter();
+                break;
+            case 'year':
+                time = dayjs(event.time).utc().format('YYYY');
+                break;
+            default: // 默认按天处理
+                time = dayjs(event.time).utc().format('YYYY-MM-DD');
+                break;
+        }
         const keyList = []
         for(let i=0; i<groups.length; i++){
             const keys = groups[i].split('.').reverse()
