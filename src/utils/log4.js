@@ -7,14 +7,14 @@ log4js.configure({
             pattern: '-yyyy-MM-dd.log',
             alwaysIncludePattern: true,
             encoding: "utf-8",
-            filename: path.join('logs/', 'access.log')
+            filename: path.join('log/', 'access.log')
         },
         application: {
             type: 'dateFile',
             pattern: '-yyyy-MM-dd.log',
             alwaysIncludePattern: true,
             encoding: "utf-8",
-            filename: path.join('logs/', 'application.log')
+            filename: path.join('log/', 'application.log')
         },
         out: {
             type: 'console'
