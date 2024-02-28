@@ -39,7 +39,7 @@ export const getConfig = () => {
             port: Number(process.env.SERVER_PORT) || 5000,
             env: process.env.NODE_ENV || 'development'
         },
-        mongo_connection_uri: process.env.MONGO_CONNECTION_URI || 'mongodb://localhost:27017/qng_mainnet',
+        mongo_connection_uri: process.env.MONGO_CONNECTION_URI || 'mongodb://127.0.0.1:27017/qng_mainnet',
         block_batches: Number(process.env.BLOCK_BATCHES) || 1000,
         bulk_save_batches: Number(process.env.BULK_SAVE_BATCHES) || 1000,
         web3: {

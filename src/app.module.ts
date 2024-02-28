@@ -21,7 +21,6 @@ import { MongooseModule } from '@nestjs/mongoose';
             inject: [ConfigService],
             useFactory: async (configService: ConfigService) => {
                 const mongoUri = configService.get<string>('mongo_connection_uri');
-                console.log(mongoUri)
                 return {
                     uri: mongoUri,
                 };
