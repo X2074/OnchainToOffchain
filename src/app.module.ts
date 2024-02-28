@@ -1,8 +1,9 @@
 import { Global, Logger, Module } from '@nestjs/common';
 import { HomeModule } from '@/modules/home/home.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { getConfig } from './config';
 import { LogModule } from '@/log/log.module';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Global()
 @Module({
@@ -14,6 +15,18 @@ import { LogModule } from '@/log/log.module';
         }),
         LogModule,
         HomeModule,
+        MongooseModule.forRootAsync({
+            connectionName: 'qng_mainnet',
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: async (configService: ConfigService) => {
+                const mongoUri = configService.get<string>('mongo_connection_uri');
+                console.log(mongoUri)
+                return {
+                    uri: mongoUri,
+                };
+            },
+        })
     ],
     controllers: [],
     providers: [Logger],

@@ -7,7 +7,7 @@ import 'winston-daily-rotate-file';
 import DailyRotateFile from 'winston-daily-rotate-file';
 
 const consoleTransports = new Console({
-  level: 'info',
+  level: 'debug',
   format: winston.format.combine(
     winston.format.timestamp(),
     utilities.format.nestLike(),
