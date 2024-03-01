@@ -1,7 +1,9 @@
 import {Controller, Get, Inject, LoggerService} from '@nestjs/common';
 import { HomeService } from '@/modules/home/home.service';
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
+import { ApiTags } from "@nestjs/swagger";
 
+@ApiTags('home')
 @Controller()
 export class HomeController {
     constructor(

@@ -1,6 +1,7 @@
 import { Global, Logger, Module } from '@nestjs/common';
 import { HomeModule } from '@/modules/home/home.module';
-import { ContractModule } from '@/modules/contract/contract.module';
+import { ContractsModule } from '@/modules/contracts/contracts.module';
+import { EventsModule } from '@/modules/events/events.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { getConfig } from './config';
 import { LogModule } from '@/log/log.module';
@@ -14,7 +15,6 @@ import { MongooseModule } from '@nestjs/mongoose';
             cache: true,
             load: [getConfig],
         }),
-        LogModule,
         MongooseModule.forRootAsync({
             connectionName: 'qng_mainnet',
             imports: [ConfigModule],
@@ -27,7 +27,9 @@ import { MongooseModule } from '@nestjs/mongoose';
             },
         }),
         HomeModule,
-        ContractModule,
+        ContractsModule,
+        EventsModule,
+        LogModule,
     ],
     controllers: [],
     providers: [Logger],

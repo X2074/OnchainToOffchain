@@ -15,7 +15,7 @@ export class Contract {
     name: string;
 
     @Prop({ type: Array, required: true, select: false })
-    abi: any[];
+    abi: object[];
 
     @Prop({ type: String, required: false })
     createdBy: string;
