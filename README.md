@@ -55,7 +55,7 @@ For more information about this project, please visit the [GitHub page](https://
 
 ## Roadmap
 ### Short-term Goals:
-- [ ] Switch from npm to yarn for dependency management to improve efficiency.
+- [X] Switch from npm to yarn for dependency management to improve efficiency.
 - [ ] Migrate from koa2 to the Nest.js framework to leverage its more robust modularization and microservices support.
 
 ### Mid-term Goals:

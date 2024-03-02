@@ -4,14 +4,16 @@ import { Model } from 'mongoose';
 import { CreateContractDto } from './contract.dto';
 import { Contract, ContractDocument } from '@/schema/contract.schema';
 import { ConfigService } from '@nestjs/config';
+import { EventsService } from "@/modules/events/events.service";
 import { Web3 } from "web3";
 
 @Injectable()
 export class ContractsService {
     constructor(
         @InjectModel(Contract.name, 'qng_mainnet')
-        private contractModel: Model<ContractDocument>,
-        private configService: ConfigService
+        private readonly contractModel: Model<ContractDocument>,
+        private readonly configService: ConfigService,
+        private readonly eventsService: EventsService
     ) {}
 
     async create(createContractDto: CreateContractDto): Promise<Contract> {
@@ -70,8 +72,49 @@ export class ContractsService {
         return contracts
     }
 
-    async findByAddress(address): Promise<Contract>{
-        const contract = await this.contractModel.findOne({address: address.toLowerCase()});
+    async findOne(address): Promise<Contract>{
+        const contract = await this.contractModel.findOne({address: address.toLowerCase()}).exec();
         return contract
+    }
+
+    async findOneDetail(address): Promise<Contract>{
+        const contract = await this.contractModel.findOne({address: address.toLowerCase()}).exec();
+        return contract
+    }
+
+    async delete(address): Promise<Contract>{
+        const deletedContract = await this.contractModel.findOneAndDelete({address: address.toLowerCase()}).exec();
+        await this.eventsService.deleteByAddress(address);
+        return deletedContract
+    }
+
+    async update(address, contractData): Promise<Contract>{
+        const contract = await this.contractModel.findOneAndUpdate({address: address.toLowerCase()}, contractData, { new: true }).exec();
+        return contract
+    }
+
+    async startScanning(address): Promise<Contract>{
+        const contract = await this.contractModel.findOneAndUpdate({address: address.toLowerCase()}, {scannable: true}, { new: true }).exec();
+        return contract
+    }
+
+    async stopScanning(address): Promise<Contract>{
+        const contract = await this.contractModel.findOneAndUpdate({address: address.toLowerCase()}, {scannable: false}, { new: true }).exec();
+        return contract
+    }
+
+    async clearEvents(address): Promise<Contract>{
+        const contract = await this.contractModel.findOne({address: address.toLowerCase()}).exec();
+        if (!contract) {
+            return contract;
+        }
+        const scannable = contract.scannable;
+        //如果原先服务未停止，暂停事件扫描任务
+        if(scannable){
+            await this.stopScanning(address);
+        }
+        await this.eventsService.deleteByAddress(address);
+        //更新起始块
+        return this.update(address,{scannable, lastScannedBlock: contract.createdBlock ? contract.createdBlock : 0});
     }
 }
