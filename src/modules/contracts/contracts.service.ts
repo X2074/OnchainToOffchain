@@ -1,4 +1,4 @@
-import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateContractDto } from './contract.dto';
@@ -9,23 +9,27 @@ import { Web3 } from "web3";
 
 @Injectable()
 export class ContractsService {
+    private readonly rpc: string;
+    private readonly web3: Web3;
     constructor(
         @InjectModel(Contract.name, 'qng_mainnet')
         private readonly contractModel: Model<ContractDocument>,
         private readonly configService: ConfigService,
         private readonly eventsService: EventsService
-    ) {}
+    ) {
+        this.rpc = this.configService.get<string>('web3.rpc');
+        const httpProvider = new Web3.providers.HttpProvider(this.rpc);
+        this.web3 = new Web3(httpProvider);
+    }
 
     async create(createContractDto: CreateContractDto): Promise<Contract> {
         if (createContractDto.createdHash){
-            const httpProvider = new Web3.providers.HttpProvider(this.configService.get<string>('web3.rpc'));
-            const web3 = new Web3(httpProvider);
             // 获取合约创建交易的信息
-            const transaction = await web3.eth.getTransactionReceipt(createContractDto.createdHash);
+            const transaction = await this.web3.eth.getTransactionReceipt(createContractDto.createdHash);
             if (transaction && transaction.contractAddress && transaction.contractAddress.toLowerCase() === createContractDto.address.toLowerCase()) {
                 // 校验通过时，记录创建人和时间
                 const createdBy = transaction.from.toLowerCase();
-                const block = await web3.eth.getBlock(transaction.blockNumber)
+                const block = await this.web3.eth.getBlock(transaction.blockNumber)
                 const createdTime = new Date(Number(block.timestamp) * 1000)
                 const createdContract= await this.contractModel.create({
                     address: createContractDto.address.toLowerCase(),

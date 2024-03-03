@@ -1,5 +1,6 @@
-import {IsArray, IsOptional, IsString} from 'class-validator';
-import {ApiProperty} from "@nestjs/swagger";
+import { IsArray, IsOptional, IsString } from 'class-validator';
+import { ApiProperty } from "@nestjs/swagger";
+import { ContractAbi } from "web3/lib/types";
 
 export class CreateContractDto {
     @ApiProperty({
@@ -22,7 +23,7 @@ export class CreateContractDto {
         items: { type: 'object' },
     })
     @IsArray()
-    readonly abi: Array<object>;
+    readonly abi: ContractAbi;
 
     @ApiProperty({
         description: 'The hash of the transaction that created the contract, helping the system quickly locate the block created by the contract.',
@@ -50,5 +51,5 @@ export class UpdateContractDto {
     })
     @IsArray()
     @IsOptional()
-    readonly abi?: Array<object>;
+    readonly abi?: ContractAbi;
 }

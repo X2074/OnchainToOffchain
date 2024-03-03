@@ -12,5 +12,6 @@ import { Contract, ContractSchema } from '@/schema/contract.schema';
     ],
     controllers: [ContractsController],
     providers: [ContractsService],
+    exports: [ContractsService]
 })
 export class ContractsModule {}

@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import { ContractAbi } from "web3/lib/types";
 
 export type ContractDocument = HydratedDocument<Contract>;
 
@@ -15,7 +16,7 @@ export class Contract {
     name: string;
 
     @Prop({ type: Array, required: true, select: false })
-    abi: object[];
+    abi: ContractAbi;
 
     @Prop({ type: String, required: false })
     createdBy: string;

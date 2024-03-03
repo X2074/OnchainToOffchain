@@ -12,7 +12,6 @@ import {
     Param
 } from '@nestjs/common';
 import { ContractsService } from './contracts.service';
-import { EventsService } from "@/modules/events/events.service";
 import { CreateContractDto, UpdateContractDto } from './contract.dto'
 import { WINSTON_MODULE_NEST_PROVIDER } from "nest-winston";
 import { Contract } from "@/schema/contract.schema";
@@ -25,7 +24,6 @@ export class ContractsController {
         @Inject(WINSTON_MODULE_NEST_PROVIDER)
         private readonly logger: LoggerService,
         private readonly contractsService: ContractsService,
-        private readonly eventsService: EventsService
     ) {
         this.logger.log('Contracts Controller init')
     }

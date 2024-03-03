@@ -6,6 +6,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { getConfig } from './config';
 import { LogModule } from '@/log/log.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { ScheduleModule } from '@nestjs/schedule';
+import { TasksModule } from "@/tasks/tasks.module";
+import { CacheModule } from "@nestjs/cache-manager";
 
 @Global()
 @Module({
@@ -15,6 +18,7 @@ import { MongooseModule } from '@nestjs/mongoose';
             cache: true,
             load: [getConfig],
         }),
+        CacheModule.register(),
         MongooseModule.forRootAsync({
             connectionName: 'qng_mainnet',
             imports: [ConfigModule],
@@ -30,6 +34,8 @@ import { MongooseModule } from '@nestjs/mongoose';
         ContractsModule,
         EventsModule,
         LogModule,
+        ScheduleModule.forRoot(),
+        TasksModule
     ],
     controllers: [],
     providers: [Logger],
