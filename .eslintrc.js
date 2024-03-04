@@ -3,7 +3,10 @@ module.exports = {
     browser: true,
     es2021: true
   },
-  extends: 'standard',
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
+  ],
   overrides: [
     {
       env: {
@@ -17,10 +20,14 @@ module.exports = {
       }
     }
   ],
+  parser: '@typescript-eslint/parser',
   parserOptions: {
     ecmaVersion: 'latest',
-    sourceType: 'module'
+    sourceType: 'module',
   },
+  plugins: [
+    '@typescript-eslint',
+  ],
   rules: {
   }
 }

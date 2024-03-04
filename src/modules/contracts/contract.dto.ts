@@ -1,55 +1,55 @@
-import { IsArray, IsOptional, IsString } from 'class-validator';
-import { ApiProperty } from "@nestjs/swagger";
-import { ContractAbi } from "web3/lib/types";
+import { IsArray, IsOptional, IsString } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger'
+import { ContractAbi } from 'web3/lib/types'
 
 export class CreateContractDto {
     @ApiProperty({
-        description: 'The contract address.'
+      description: 'The contract address.'
     })
     @IsString()
-    readonly address: string;
+  readonly address: string
 
     @ApiProperty({
-        description: 'Naming the contract to help users quickly understand it.',
-        required: false
+      description: 'Naming the contract to help users quickly understand it.',
+      required: false
     })
     @IsString()
     @IsOptional()
-    readonly name?: string;
+    readonly name?: string
 
     @ApiProperty({
-        description: 'The ABI (Application Binary Interface) of the contract, defining how to interact with the contract, including its methods and events.',
-        type: 'array',
-        items: { type: 'object' },
+      description: 'The ABI (Application Binary Interface) of the contract, defining how to interact with the contract, including its methods and events.',
+      type: 'array',
+      items: { type: 'object' }
     })
     @IsArray()
-    readonly abi: ContractAbi;
+    readonly abi: ContractAbi
 
     @ApiProperty({
-        description: 'The hash of the transaction that created the contract, helping the system quickly locate the block created by the contract.',
-        required: false
+      description: 'The hash of the transaction that created the contract, helping the system quickly locate the block created by the contract.',
+      required: false
     })
     @IsString()
     @IsOptional()
-    readonly createdHash?: string;
+    readonly createdHash?: string
 }
 
 export class UpdateContractDto {
     @ApiProperty({
-        description: 'Naming the contract to help users quickly understand it.',
-        required: false
+      description: 'Naming the contract to help users quickly understand it.',
+      required: false
     })
     @IsString()
     @IsOptional()
-    readonly name?: string;
+  readonly name?: string
 
     @ApiProperty({
-        description: 'The ABI of the contract. Optional when updating a contract.',
-        type: 'array',
-        items: { type: 'object' },
-        required: false
+      description: 'The ABI of the contract. Optional when updating a contract.',
+      type: 'array',
+      items: { type: 'object' },
+      required: false
     })
     @IsArray()
     @IsOptional()
-    readonly abi?: ContractAbi;
+    readonly abi?: ContractAbi
 }

@@ -14,22 +14,22 @@ OnchainToOffchain is a blockchain-oriented data synchronization tool that synchr
 ### Installation
 Ensure you have Node.js and npm installed. Then, run the following command to install dependencies:
 ```bash
-npm install
+yarn
 ```
 ### Running
 - To run in production:
 ```bash
-npm run start
+yarn run start
 ```
 - To run in development mode (with hot reload):
 ```bash
-npm run dev
+yarn run start:dev
 ```
 ## Dependencies
 
 This project utilizes the following key dependencies:
 
-- **koa**: For building web services.
+- **@nestjs/common, @nestjs/core, and other @nestjs modules**: For building modular and easily maintainable web services.
 - **mongoose**: For MongoDB data interaction.
 - **web3**: For interacting with Ethereum-compatible blockchains.
 - **cron**: For scheduling tasks.
@@ -37,7 +37,8 @@ This project utilizes the following key dependencies:
 
 ## Development Dependencies
 
-- **eslint**: For code quality control.
+- **@typescript-eslint/eslint-plugin and @typescript-eslint/parser**: For enforcing code style and quality control specific to TypeScript. 
+- **eslint-config-prettier and eslint-plugin-prettier**: Integrates ESLint with Prettier for code formatting.
 - **nodemon**: For hot reloading in the development environment.
 - **cross-env**: For setting environment variables.
 

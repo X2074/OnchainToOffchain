@@ -13,22 +13,22 @@ OnchainToOffchain 是一个面向区块链的数据同步工具，它将链上�
 ### 安装
 - 确保您已经安装了 Node.js 和 npm。然后运行以下命令来安装依赖项：
 ```bash
-npm install
+yarn
 ```
 ### 运行
 - 在生产环境中运行：
 ```bash
-npm run start
+yarn run start
 ```
 - 在开发环境中运行（支持热重载）：
 ```bash
-npm run dev
+yarn run start:dev
 ```
 ## 依赖
 
 本项目使用了以下主要的依赖：
 
-- **koa**：用于构建 web 服务。
+- **@nestjs/common, @nestjs/core, and other @nestjs modules**：用于构建模块化且易于维护的 web 服务。
 
 - **mongoose**：用于 MongoDB 数据交互。
 
@@ -40,7 +40,9 @@ npm run dev
 
 ## 开发依赖
 
-- **eslint**：用于代码质量控制。
+- **@typescript-eslint/eslint-plugin and @typescript-eslint/parser**: 用于强制执行特定于TypeScript的代码样式和质量控制。
+
+- **eslint-config-prettier and eslint-plugin-prettier**: 将ESLint与Prettier集成以进行代码格式化。
 
 - **nodemon**：用于开发环境的热重载。
 
