@@ -6,7 +6,7 @@ export class Event {
     @Prop({ type: Number, select: false })
       __v: number
 
-    @Prop({ type: String, required: true, unique: true })
+    @Prop({ type: String, required: true, index: true })
       address: string
 
     @Prop({ type: Number, require: true })

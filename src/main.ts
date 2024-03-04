@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import { ConfigService } from '@nestjs/config'
 import { HttpExceptionFilter } from '@/filters/http-exception.filter'
+import { LoggingInterceptor } from '@/interceptors/logging.interceptor'
 import { BadRequestException, Logger, ValidationPipe } from '@nestjs/common'
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston'
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
@@ -10,6 +11,7 @@ async function bootstrap () {
   const app = await NestFactory.create(AppModule, {})
   app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER))
   const logger = new Logger()
+  app.useGlobalInterceptors(new LoggingInterceptor(logger))
   app.useGlobalFilters(new HttpExceptionFilter(logger))
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true, // 如果设置为 true，验证器将去除未使用任何装饰器的属性
@@ -31,11 +33,11 @@ async function bootstrap () {
     .addTag('free')
     .build()
   const document = SwaggerModule.createDocument(app, config)
-  SwaggerModule.setup('document', app, document)
+  SwaggerModule.setup('api', app, document)
   const configService = app.get(ConfigService)
   const PORT = configService.get<number>('server.port')
   await app.listen(PORT)
   logger.log(`Server run at http://localhost:${PORT}/`)
-  logger.log(`Api document: http://localhost:${PORT}/document`)
+  logger.log(`Api document: http://localhost:${PORT}/api`)
 }
 bootstrap()

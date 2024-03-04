@@ -10,7 +10,7 @@ const mongodbUriRegex = /^mongodb:\/\/(?:[a-zA-Z0-9]+:[a-zA-Z0-9]+@)?[a-zA-Z0-9.
 const schema = Joi.object().keys({
   server: Joi.object({
     port: Joi.number().default(3000),
-    env: Joi.string().valid('development', 'production', 'test', 'provision').default('development')
+    env: Joi.string().valid('development', 'production', 'test', 'provision').default('production')
   }),
   mongo_connection_uri: Joi.string().regex(mongodbUriRegex),
   block_batches: Joi.number().default(1000),
@@ -36,7 +36,7 @@ export const getConfig = () => {
   const config = {
     server: {
       port: Number(process.env.SERVER_PORT) || 5000,
-      env: process.env.NODE_ENV || 'development'
+      env: process.env.NODE_ENV || 'production'
     },
     mongo_connection_uri: process.env.MONGO_CONNECTION_URI || 'mongodb://127.0.0.1:27017/qng_mainnet',
     block_batches: Number(process.env.BLOCK_BATCHES) || 1000,

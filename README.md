@@ -57,10 +57,10 @@ For more information about this project, please visit the [GitHub page](https://
 ## Roadmap
 ### Short-term Goals:
 - [X] Switch from npm to yarn for dependency management to improve efficiency.
-- [ ] Migrate from koa2 to the Nest.js framework to leverage its more robust modularization and microservices support.
+- [X] Migrate from koa2 to the Nest.js framework to leverage its more robust modularization and microservices support.
 
 ### Mid-term Goals:
-- [ ] Improve the API documentation and logging system to enhance development and debugging efficiency.
+- [X] Improve the API documentation and logging system to enhance development and debugging efficiency.
 - [ ] Add recording features for block and transaction data, and improve synchronization of on-chain account address asset information.
 
 ### Long-term Goals:

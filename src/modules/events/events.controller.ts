@@ -21,7 +21,7 @@ dayjs.extend(utc)
 dayjs.extend(quarterOfYear)
 
 @ApiTags('events')
-@Controller('/contracts/events')
+@Controller('/events')
 export class EventsController {
   constructor (
         @Inject(WINSTON_MODULE_NEST_PROVIDER)
@@ -43,8 +43,8 @@ export class EventsController {
     @ApiQuery({ name: 'pageSize', required: false, description: 'Number of results per page', type: Number, example: 10 })
   async getAllEvents (
         @Query('address') address: string,
-        @Query('page') page: string,
-        @Query('pageSize') pageSize: string
+        @Query('page') page: string = '1',
+        @Query('pageSize') pageSize: string ='10'
   ): Promise<{ total: number; events: Event[]; page: number; pageSize: number }> {
     if (!address) {
       throw new HttpException('Address is required', HttpStatus.BAD_REQUEST)

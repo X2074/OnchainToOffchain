@@ -82,7 +82,7 @@ export class ContractsService {
   }
 
   async findOneDetail (address): Promise<Contract> {
-    const contract = await this.contractModel.findOne({ address: address.toLowerCase() }).exec()
+    const contract = await this.contractModel.findOne({ address: address.toLowerCase() }).select('+abi').exec()
     return contract
   }
 
