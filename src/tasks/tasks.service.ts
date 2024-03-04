@@ -30,7 +30,7 @@ export class TasksService {
     /**
      * 定期获取合约事件 5分钟执行一次
      */
-    @Cron('0 */1 * * * *')
+    @Cron('0 */5 * * * *')
   async HandleContractsEventsScanning () {
     try {
       const contracts = await this.contractsService.findAllDetail({ scannable: true, scanning: false }, 'address createdBlock lastScannedBlock scannable scanning abi')
