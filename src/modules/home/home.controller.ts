@@ -6,16 +6,16 @@ import { ApiTags } from '@nestjs/swagger'
 @ApiTags('home')
 @Controller()
 export class HomeController {
-  constructor (
+    constructor(
         private readonly homeService: HomeService,
         @Inject(WINSTON_MODULE_NEST_PROVIDER)
         private readonly logger: LoggerService
-  ) {
-    this.logger.log('Home Controller init')
-  }
+    ) {
+        this.logger.log('Home Controller init')
+    }
 
     @Get()
-  getHello (): string {
-    return this.homeService.getHello()
-  }
+    getHello(): string {
+        return this.homeService.getHello()
+    }
 }

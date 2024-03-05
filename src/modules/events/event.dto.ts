@@ -1,20 +1,32 @@
-import { IsOptional, IsString, IsObject, IsNumber, ValidateNested, IsArray, IsDefined, IsIn } from 'class-validator'
+import {
+    IsOptional,
+    IsString,
+    IsObject,
+    IsNumber,
+    ValidateNested,
+    IsArray,
+    IsDefined,
+    IsIn,
+} from 'class-validator'
 import { Type } from 'class-transformer'
 
 class QueryCriteria {
-    @IsDefined({ message: 'The query criteria must include contract address information.' })
+    @IsDefined({
+        message:
+            'The query criteria must include contract address information.',
+    })
     @IsString()
-      address: string
+    address: string
 
     @IsObject()
     @IsOptional()
-      time?: object
+    time?: object
 }
 export class QueryEventDto {
     @IsObject()
     @ValidateNested()
     @Type(() => QueryCriteria)
-  readonly queryCriteria: QueryCriteria
+    readonly queryCriteria: QueryCriteria
 
     @IsString()
     @IsOptional()
@@ -46,7 +58,7 @@ export class StatisticsEventDto {
     @IsObject()
     @ValidateNested()
     @Type(() => QueryCriteria)
-  readonly queryCriteria: QueryCriteria
+    readonly queryCriteria: QueryCriteria
 
     @IsObject()
     @ValidateNested()
@@ -55,7 +67,10 @@ export class StatisticsEventDto {
 
     @IsString()
     @IsOptional()
-    @IsIn(['all', 'hour', 'day', 'week', 'month', 'quarter', 'year'], { message: 'Unit must be one of the following: all, hour, day, week, month, quarter, year.' })
+    @IsIn(['all', 'hour', 'day', 'week', 'month', 'quarter', 'year'], {
+        message:
+            'Unit must be one of the following: all, hour, day, week, month, quarter, year.',
+    })
     readonly unit: string = 'day'
 
     @IsArray()

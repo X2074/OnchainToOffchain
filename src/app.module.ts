@@ -12,33 +12,35 @@ import { CacheModule } from '@nestjs/cache-manager'
 
 @Global()
 @Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      cache: true,
-      load: [getConfig]
-    }),
-    CacheModule.register(),
-    MongooseModule.forRootAsync({
-      connectionName: 'qng_mainnet',
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => {
-        const mongoUri = configService.get<string>('mongo_connection_uri')
-        return {
-          uri: mongoUri
-        }
-      }
-    }),
-    HomeModule,
-    ContractsModule,
-    EventsModule,
-    LogModule,
-    ScheduleModule.forRoot(),
-    TasksModule
-  ],
-  controllers: [],
-  providers: [Logger],
-  exports: [Logger]
+    imports: [
+        ConfigModule.forRoot({
+            isGlobal: true,
+            cache: true,
+            load: [getConfig],
+        }),
+        CacheModule.register(),
+        MongooseModule.forRootAsync({
+            connectionName: 'qng_mainnet',
+            imports: [ConfigModule],
+            inject: [ConfigService],
+            useFactory: async (configService: ConfigService) => {
+                const mongoUri = configService.get<string>(
+                    'mongo_connection_uri'
+                )
+                return {
+                    uri: mongoUri,
+                }
+            },
+        }),
+        HomeModule,
+        ContractsModule,
+        EventsModule,
+        LogModule,
+        ScheduleModule.forRoot(),
+        TasksModule,
+    ],
+    controllers: [],
+    providers: [Logger],
+    exports: [Logger],
 })
 export class AppModule {}

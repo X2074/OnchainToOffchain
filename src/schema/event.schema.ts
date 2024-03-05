@@ -4,51 +4,51 @@ import { HydratedDocument } from 'mongoose'
 @Schema()
 export class Event {
     @Prop({ type: Number, select: false })
-      __v: number
+    __v: number
 
     @Prop({ type: String, required: true, index: true })
-      address: string
+    address: string
 
     @Prop({ type: Number, require: true })
-      blockNumber: number
+    blockNumber: number
 
     @Prop({ type: String, require: true })
-      blockHash: string
+    blockHash: string
 
     @Prop({ type: Date, require: true, index: true })
-      time: Date
+    time: Date
 
     @Prop({ type: String, require: true })
-      transactionHash: string
+    transactionHash: string
 
     @Prop({ type: Number, require: true })
-      transactionIndex: number
+    transactionIndex: number
 
     @Prop({ type: Array, require: true })
-      topics: string[]
+    topics: string[]
 
     @Prop({ type: String, require: true })
-      data: string
+    data: string
 
     @Prop({ type: Number, require: true })
-      logIndex: number
+    logIndex: number
 
     @Prop({ type: Boolean, require: true })
-      removed: boolean
+    removed: boolean
 
     @Prop({ type: Object, require: true })
-      returnValues: object
+    returnValues: object
 
     @Prop({ type: String, require: true, index: true })
-      event: string
+    event: string
 
     @Prop({ type: String, require: true })
-      signature: string
+    signature: string
 
     @Prop({ type: Array, require: true })
-      raw: object[]
+    raw: object[]
 }
 
-export type EventDocument = HydratedDocument<Event>;
+export type EventDocument = HydratedDocument<Event>
 
 export const EventSchema = SchemaFactory.createForClass(Event)

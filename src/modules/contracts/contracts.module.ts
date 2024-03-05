@@ -6,12 +6,15 @@ import { ContractsService } from './contracts.service'
 import { Contract, ContractSchema } from '@/schema/contract.schema'
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([{ name: Contract.name, schema: ContractSchema }], 'qng_mainnet'),
-    EventsModule
-  ],
-  controllers: [ContractsController],
-  providers: [ContractsService],
-  exports: [ContractsService]
+    imports: [
+        MongooseModule.forFeature(
+            [{ name: Contract.name, schema: ContractSchema }],
+            'qng_mainnet'
+        ),
+        EventsModule,
+    ],
+    controllers: [ContractsController],
+    providers: [ContractsService],
+    exports: [ContractsService],
 })
 export class ContractsModule {}
