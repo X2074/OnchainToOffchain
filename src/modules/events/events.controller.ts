@@ -78,9 +78,7 @@ export class EventsController {
     }
 
     @Post('query')
-    async getEvents(
-        @Body() queryEventDto: QueryEventDto
-    ): Promise<{
+    async getEvents(@Body() queryEventDto: QueryEventDto): Promise<{
         total: number
         events: Event[]
         page: number
