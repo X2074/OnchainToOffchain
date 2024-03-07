@@ -3,9 +3,6 @@ import { HydratedDocument } from 'mongoose'
 
 @Schema()
 export class Event {
-    @Prop({ type: Number, select: false })
-    __v: number
-
     @Prop({ type: String, required: true, index: true })
     address: string
 
@@ -46,7 +43,7 @@ export class Event {
     signature: string
 
     @Prop({ type: Array, require: true })
-    raw: object[]
+    raw: object
 }
 
 export type EventDocument = HydratedDocument<Event>

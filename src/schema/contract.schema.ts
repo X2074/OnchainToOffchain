@@ -4,9 +4,6 @@ import { ContractAbi } from 'web3/lib/types'
 
 @Schema()
 export class Contract {
-    @Prop({ type: Number, select: false })
-    __v: number
-
     @Prop({ type: String, required: true, unique: true })
     address: string
 
