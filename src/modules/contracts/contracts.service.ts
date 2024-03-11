@@ -41,7 +41,7 @@ export class ContractsService {
                     transaction.blockNumber
                 )
                 const createdTime = new Date(Number(block.timestamp) * 1000)
-                return await this.contractModel.create({
+                return this.contractModel.create({
                     address: createContractDto.address.toLowerCase(),
                     name:
                         createContractDto.name ||
@@ -61,7 +61,7 @@ export class ContractsService {
                 )
             }
         } else {
-            return await this.contractModel.create({
+            return this.contractModel.create({
                 address: createContractDto.address.toLowerCase(),
                 name:
                     createContractDto.name ||
@@ -95,26 +95,32 @@ export class ContractsService {
     }
 
     async findAllDetail(queryCriteria: object, selectField: string): Promise<Contract[]> {
-        return await this.contractModel
+        return this.contractModel
             .find(queryCriteria)
             .select(selectField)
             .exec()
     }
 
     async findOne(address: string): Promise<ContractSummaryDto> {
-        return await this.contractModel
+        return this.contractModel
             .findOne({ address: address.toLowerCase() })
             .exec()
     }
 
     async findOneDetail(address: string): Promise<Contract> {
-        return await this.contractModel
+        return this.contractModel
             .findOne({ address: address.toLowerCase() })
             .select('+abi')
             .exec()
     }
 
     async delete(address: string): Promise<Contract> {
+        const contractExists = await this.findOne(address)
+        if (!contractExists) {
+            throw new NotFoundException(
+                `Contract with address ${address} not found.`
+            );
+        }
         const deletedContract = await this.contractModel
             .findOneAndDelete({ address: address.toLowerCase() })
             .select('+abi')
@@ -130,7 +136,7 @@ export class ContractsService {
                 `Contract with address ${address} not found.`
             );
         }
-        return await this.contractModel
+        return this.contractModel
             .findOneAndUpdate(
                 { address: address.toLowerCase() },
                 contractData,

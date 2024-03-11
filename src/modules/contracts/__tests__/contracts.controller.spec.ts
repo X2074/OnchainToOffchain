@@ -148,16 +148,6 @@ describe('ContractsController', () => {
                 mockContract1
             )
         })
-
-        it("should throw an error if contract doesn't exist", async () => {
-            const address = mockContract1.address
-
-            jest.spyOn(contractsService, 'findOne').mockResolvedValue(null)
-
-            await expect(contractsController.delete(address)).rejects.toThrow(
-                HttpException
-            )
-        })
     })
 
     describe('update', () => {
@@ -179,16 +169,6 @@ describe('ContractsController', () => {
             expect(
                 await contractsController.update(address, updateContractDto)
             ).toEqual(expectedResult)
-        })
-
-        it("should throw an error if contract doesn't exist", async () => {
-            const address = mockContract1.address
-
-            jest.spyOn(contractsService, 'findOne').mockResolvedValue(null)
-
-            await expect(contractsController.delete(address)).rejects.toThrow(
-                HttpException
-            )
         })
     })
 
@@ -268,6 +248,21 @@ describe('ContractsController', () => {
 
             await expect(contractsController.stopScanning(address)).rejects.toThrow(
                 HttpException
+            )
+        })
+    })
+
+    describe('clearEvents', () => {
+        it('should clear events of a contract with address', async () => {
+            const address = mockContract1.address
+            const { abi, ...mockContractWithoutAbi } = mockContract1
+
+            jest.spyOn(contractsService, 'clearEvents').mockResolvedValue(
+                mockContractWithoutAbi
+            )
+
+            expect(await contractsController.clearEvents(address)).toEqual(
+                mockContractWithoutAbi
             )
         })
     })

@@ -116,12 +116,6 @@ export class ContractsController {
         type: String,
     })
     async delete(@Param('address') address: string): Promise<Contract> {
-        const contract = await this.contractsService.findOne(address)
-        if (!contract) {
-            throw new NotFoundException(
-                `Contract with address ${address} not found.`
-            )
-        }
         return this.contractsService.delete(address)
     }
 
