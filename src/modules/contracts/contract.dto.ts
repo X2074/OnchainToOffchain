@@ -62,6 +62,31 @@ export class UpdateContractDto {
     @IsArray()
     @IsOptional()
     readonly abi?: ContractAbi
+
+    @ApiProperty({
+        description: 'Whether the contract is marked for scanning.',
+        required: false,
+    })
+    @IsBoolean()
+    @IsOptional()
+    readonly scannable?: boolean
+
+    @ApiProperty({
+        description: 'Whether the contract is currently being scanned.',
+        required: false,
+    })
+    @IsBoolean()
+    @IsOptional()
+    readonly scanning?: boolean
+
+    @ApiProperty({
+        description:
+            'The last block number scanned by the system for this contract.',
+        required: false,
+    })
+    @IsNumber()
+    @IsOptional()
+    readonly lastScannedBlock?: number
 }
 
 export class ContractSummaryDto {
@@ -111,8 +136,7 @@ export class ContractSummaryDto {
         required: false,
     })
     @IsNumber()
-    @IsOptional()
-    readonly createdBlock?: number
+    readonly createdBlock: number
 
     @ApiProperty({
         description:
@@ -120,8 +144,7 @@ export class ContractSummaryDto {
         required: false,
     })
     @IsNumber()
-    @IsOptional()
-    readonly lastScannedBlock?: number
+    readonly lastScannedBlock: number
 
     @ApiProperty({
         description: 'Whether the contract is marked for scanning.',

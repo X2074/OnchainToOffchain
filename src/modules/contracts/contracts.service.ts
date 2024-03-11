@@ -1,7 +1,7 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
-import { CreateContractDto, ContractSummaryDto } from './contract.dto'
+import { ContractSummaryDto, CreateContractDto, UpdateContractDto } from './contract.dto'
 import { Contract, ContractDocument } from '@/schema/contract.schema'
 import { ConfigService } from '@nestjs/config'
 import { EventsService } from '@/modules/events/events.service'
@@ -41,7 +41,7 @@ export class ContractsService {
                     transaction.blockNumber
                 )
                 const createdTime = new Date(Number(block.timestamp) * 1000)
-                const createdContract = await this.contractModel.create({
+                return await this.contractModel.create({
                     address: createContractDto.address.toLowerCase(),
                     name:
                         createContractDto.name ||
@@ -53,7 +53,6 @@ export class ContractsService {
                     createdBlock: Number(transaction.blockNumber),
                     lastScannedBlock: Number(transaction.blockNumber) - 1,
                 })
-                return createdContract
             } else {
                 // 校验失败时，返回错误信息
                 throw new HttpException(
@@ -62,14 +61,13 @@ export class ContractsService {
                 )
             }
         } else {
-            const createdContract = await this.contractModel.create({
+            return await this.contractModel.create({
                 address: createContractDto.address.toLowerCase(),
                 name:
                     createContractDto.name ||
                     createContractDto.address.toLowerCase(),
                 abi: createContractDto.abi,
             })
-            return createdContract
         }
     }
 
@@ -96,30 +94,27 @@ export class ContractsService {
         }
     }
 
-    async findAllDetail(queryCriteria, selectField): Promise<Contract[]> {
-        const contracts = await this.contractModel
+    async findAllDetail(queryCriteria: object, selectField: string): Promise<Contract[]> {
+        return await this.contractModel
             .find(queryCriteria)
             .select(selectField)
             .exec()
-        return contracts
     }
 
-    async findOne(address): Promise<ContractSummaryDto> {
-        const contract = await this.contractModel
+    async findOne(address: string): Promise<ContractSummaryDto> {
+        return await this.contractModel
             .findOne({ address: address.toLowerCase() })
             .exec()
-        return contract
     }
 
-    async findOneDetail(address): Promise<Contract> {
-        const contract = await this.contractModel
+    async findOneDetail(address: string): Promise<Contract> {
+        return await this.contractModel
             .findOne({ address: address.toLowerCase() })
             .select('+abi')
             .exec()
-        return contract
     }
 
-    async delete(address): Promise<Contract> {
+    async delete(address: string): Promise<Contract> {
         const deletedContract = await this.contractModel
             .findOneAndDelete({ address: address.toLowerCase() })
             .select('+abi')
@@ -128,14 +123,14 @@ export class ContractsService {
         return deletedContract
     }
 
-    async update(address, contractData): Promise<Contract> {
+    async update(address: string, contractData: UpdateContractDto): Promise<Contract> {
         const contractExists = await this.findOne(address)
         if (!contractExists) {
             throw new NotFoundException(
                 `Contract with address ${address} not found.`
             );
         }
-        const updatedContract = await this.contractModel
+        return await this.contractModel
             .findOneAndUpdate(
                 { address: address.toLowerCase() },
                 contractData,
@@ -143,18 +138,17 @@ export class ContractsService {
             )
             .select('+abi')
             .exec()
-        return updatedContract
     }
 
-    async startScanning(address): Promise<ContractSummaryDto> {
+    async startScanning(address: string): Promise<ContractSummaryDto> {
         return this.update(address,{ scannable: true })
     }
 
-    async stopScanning(address): Promise<ContractSummaryDto> {
+    async stopScanning(address: string): Promise<ContractSummaryDto> {
         return this.update(address,{ scannable: false })
     }
 
-    async clearEvents(address): Promise<ContractSummaryDto> {
+    async clearEvents(address: string): Promise<ContractSummaryDto> {
         const contractExists = await this.findOne(address)
         if (!contractExists) {
             throw new NotFoundException(
