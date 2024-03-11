@@ -10,7 +10,6 @@ import {
     HttpException,
     HttpStatus,
     Param,
-    NotFoundException,
 } from '@nestjs/common'
 import { ContractsService } from './contracts.service'
 import {
@@ -165,7 +164,7 @@ export class ContractsController {
         @Param('address') address: string
     ): Promise<ContractSummaryDto> {
         const contract = await this.contractsService.findOne(address)
-        if (contract && (!contract.scannable)) {
+        if (contract && !contract.scannable) {
             throw new HttpException(
                 'Contract is stopped.',
                 HttpStatus.NO_CONTENT

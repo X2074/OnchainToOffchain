@@ -197,18 +197,20 @@ describe('ContractsController', () => {
             )
         })
 
-        it("should return 204 No Content if contract is started", async () => {
+        it('should return 204 No Content if contract is started', async () => {
             const address = mockContract1.address
             const { abi, ...mockContractWithoutAbi } = mockContract1
             const expectedFindResult = {
                 ...mockContractWithoutAbi,
                 scannable: true,
             }
-            jest.spyOn(contractsService, 'findOne').mockResolvedValue(expectedFindResult)
-
-            await expect(contractsController.startScanning(address)).rejects.toThrow(
-                HttpException
+            jest.spyOn(contractsService, 'findOne').mockResolvedValue(
+                expectedFindResult
             )
+
+            await expect(
+                contractsController.startScanning(address)
+            ).rejects.toThrow(HttpException)
         })
     })
 
@@ -237,18 +239,20 @@ describe('ContractsController', () => {
             )
         })
 
-        it("should return 204 No Content if contract is stopped", async () => {
+        it('should return 204 No Content if contract is stopped', async () => {
             const address = mockContract1.address
             const { abi, ...mockContractWithoutAbi } = mockContract1
             const expectedFindResult = {
                 ...mockContractWithoutAbi,
                 scannable: false,
             }
-            jest.spyOn(contractsService, 'findOne').mockResolvedValue(expectedFindResult)
-
-            await expect(contractsController.stopScanning(address)).rejects.toThrow(
-                HttpException
+            jest.spyOn(contractsService, 'findOne').mockResolvedValue(
+                expectedFindResult
             )
+
+            await expect(
+                contractsController.stopScanning(address)
+            ).rejects.toThrow(HttpException)
         })
     })
 

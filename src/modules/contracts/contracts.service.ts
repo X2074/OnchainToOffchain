@@ -1,7 +1,16 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
+import {
+    HttpException,
+    HttpStatus,
+    Injectable,
+    NotFoundException,
+} from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
-import { ContractSummaryDto, CreateContractDto, UpdateContractDto } from './contract.dto'
+import {
+    ContractSummaryDto,
+    CreateContractDto,
+    UpdateContractDto,
+} from './contract.dto'
 import { Contract, ContractDocument } from '@/schema/contract.schema'
 import { ConfigService } from '@nestjs/config'
 import { EventsService } from '@/modules/events/events.service'
@@ -94,11 +103,11 @@ export class ContractsService {
         }
     }
 
-    async findAllDetail(queryCriteria: object, selectField: string): Promise<Contract[]> {
-        return this.contractModel
-            .find(queryCriteria)
-            .select(selectField)
-            .exec()
+    async findAllDetail(
+        queryCriteria: object,
+        selectField: string
+    ): Promise<Contract[]> {
+        return this.contractModel.find(queryCriteria).select(selectField).exec()
     }
 
     async findOne(address: string): Promise<ContractSummaryDto> {
@@ -119,7 +128,7 @@ export class ContractsService {
         if (!contractExists) {
             throw new NotFoundException(
                 `Contract with address ${address} not found.`
-            );
+            )
         }
         const deletedContract = await this.contractModel
             .findOneAndDelete({ address: address.toLowerCase() })
@@ -129,12 +138,15 @@ export class ContractsService {
         return deletedContract
     }
 
-    async update(address: string, contractData: UpdateContractDto): Promise<Contract> {
+    async update(
+        address: string,
+        contractData: UpdateContractDto
+    ): Promise<Contract> {
         const contractExists = await this.findOne(address)
         if (!contractExists) {
             throw new NotFoundException(
                 `Contract with address ${address} not found.`
-            );
+            )
         }
         return this.contractModel
             .findOneAndUpdate(
@@ -147,11 +159,11 @@ export class ContractsService {
     }
 
     async startScanning(address: string): Promise<ContractSummaryDto> {
-        return this.update(address,{ scannable: true })
+        return this.update(address, { scannable: true })
     }
 
     async stopScanning(address: string): Promise<ContractSummaryDto> {
-        return this.update(address,{ scannable: false })
+        return this.update(address, { scannable: false })
     }
 
     async clearEvents(address: string): Promise<ContractSummaryDto> {
@@ -159,7 +171,7 @@ export class ContractsService {
         if (!contractExists) {
             throw new NotFoundException(
                 `Contract with address ${address} not found.`
-            );
+            )
         }
         const scannable = contractExists.scannable
         // 如果原先服务未停止，暂停事件扫描任务
@@ -170,7 +182,9 @@ export class ContractsService {
         // 更新起始块
         return this.update(address, {
             scannable,
-            lastScannedBlock: contractExists.createdBlock ? contractExists.createdBlock : 0,
+            lastScannedBlock: contractExists.createdBlock
+                ? contractExists.createdBlock
+                : 0,
         })
     }
 }
