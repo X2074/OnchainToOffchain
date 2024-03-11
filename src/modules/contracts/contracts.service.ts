@@ -1,7 +1,7 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common'
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Model } from 'mongoose'
-import { CreateContractDto } from './contract.dto'
+import { CreateContractDto, ContractSummaryDto } from './contract.dto'
 import { Contract, ContractDocument } from '@/schema/contract.schema'
 import { ConfigService } from '@nestjs/config'
 import { EventsService } from '@/modules/events/events.service'
@@ -78,7 +78,7 @@ export class ContractsService {
         pageSize: number
     ): Promise<{
         total: number
-        contracts: Contract[]
+        contracts: ContractSummaryDto[]
         page: number
         pageSize: number
     }> {
@@ -104,7 +104,7 @@ export class ContractsService {
         return contracts
     }
 
-    async findOne(address): Promise<Contract> {
+    async findOne(address): Promise<ContractSummaryDto> {
         const contract = await this.contractModel
             .findOne({ address: address.toLowerCase() })
             .exec()
@@ -122,52 +122,46 @@ export class ContractsService {
     async delete(address): Promise<Contract> {
         const deletedContract = await this.contractModel
             .findOneAndDelete({ address: address.toLowerCase() })
+            .select('+abi')
             .exec()
         await this.eventsService.deleteByAddress(address)
         return deletedContract
     }
 
     async update(address, contractData): Promise<Contract> {
-        const contract = await this.contractModel
+        const contractExists = await this.findOne(address)
+        if (!contractExists) {
+            throw new NotFoundException(
+                `Contract with address ${address} not found.`
+            );
+        }
+        const updatedContract = await this.contractModel
             .findOneAndUpdate(
                 { address: address.toLowerCase() },
                 contractData,
                 { new: true }
             )
+            .select('+abi')
             .exec()
-        return contract
+        return updatedContract
     }
 
-    async startScanning(address): Promise<Contract> {
-        const contract = await this.contractModel
-            .findOneAndUpdate(
-                { address: address.toLowerCase() },
-                { scannable: true },
-                { new: true }
-            )
-            .exec()
-        return contract
+    async startScanning(address): Promise<ContractSummaryDto> {
+        return this.update(address,{ scannable: true })
     }
 
-    async stopScanning(address): Promise<Contract> {
-        const contract = await this.contractModel
-            .findOneAndUpdate(
-                { address: address.toLowerCase() },
-                { scannable: false },
-                { new: true }
-            )
-            .exec()
-        return contract
+    async stopScanning(address): Promise<ContractSummaryDto> {
+        return this.update(address,{ scannable: false })
     }
 
-    async clearEvents(address): Promise<Contract> {
-        const contract = await this.contractModel
-            .findOne({ address: address.toLowerCase() })
-            .exec()
-        if (!contract) {
-            return contract
+    async clearEvents(address): Promise<ContractSummaryDto> {
+        const contractExists = await this.findOne(address)
+        if (!contractExists) {
+            throw new NotFoundException(
+                `Contract with address ${address} not found.`
+            );
         }
-        const scannable = contract.scannable
+        const scannable = contractExists.scannable
         // 如果原先服务未停止，暂停事件扫描任务
         if (scannable) {
             await this.stopScanning(address)
@@ -176,7 +170,7 @@ export class ContractsService {
         // 更新起始块
         return this.update(address, {
             scannable,
-            lastScannedBlock: contract.createdBlock ? contract.createdBlock : 0,
+            lastScannedBlock: contractExists.createdBlock ? contractExists.createdBlock : 0,
         })
     }
 }

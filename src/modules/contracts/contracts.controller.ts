@@ -10,9 +10,14 @@ import {
     HttpException,
     HttpStatus,
     Param,
+    NotFoundException,
 } from '@nestjs/common'
 import { ContractsService } from './contracts.service'
-import { CreateContractDto, UpdateContractDto } from './contract.dto'
+import {
+    CreateContractDto,
+    UpdateContractDto,
+    ContractSummaryDto,
+} from './contract.dto'
 import { WINSTON_MODULE_NEST_PROVIDER } from 'nest-winston'
 import { Contract } from '@/schema/contract.schema'
 import {
@@ -70,7 +75,7 @@ export class ContractsController {
         @Query('pageSize') pageSize: string
     ): Promise<{
         total: number
-        contracts: Contract[]
+        contracts: ContractSummaryDto[]
         page: number
         pageSize: number
     }> {
@@ -86,7 +91,9 @@ export class ContractsController {
         description: 'Contract address',
         type: String,
     })
-    async findOne(@Param('address') address: string): Promise<Contract> {
+    async findOne(
+        @Param('address') address: string
+    ): Promise<ContractSummaryDto> {
         return this.contractsService.findOne(address)
     }
 
@@ -109,6 +116,12 @@ export class ContractsController {
         type: String,
     })
     async delete(@Param('address') address: string): Promise<Contract> {
+        const contract = await this.contractsService.findOne(address)
+        if (!contract) {
+            throw new NotFoundException(
+                `Contract with address ${address} not found.`
+            )
+        }
         return this.contractsService.delete(address)
     }
 
@@ -134,7 +147,16 @@ export class ContractsController {
         description: 'Contract address',
         type: String,
     })
-    async startScanning(@Param('address') address: string): Promise<Contract> {
+    async startScanning(
+        @Param('address') address: string
+    ): Promise<ContractSummaryDto> {
+        const contract = await this.contractsService.findOne(address)
+        if (contract && contract.scannable) {
+            throw new HttpException(
+                'Contract is started.',
+                HttpStatus.NO_CONTENT
+            )
+        }
         return this.contractsService.startScanning(address)
     }
 
@@ -145,7 +167,16 @@ export class ContractsController {
         description: 'Contract address',
         type: String,
     })
-    async sopScanning(@Param('address') address: string): Promise<Contract> {
+    async stopScanning(
+        @Param('address') address: string
+    ): Promise<ContractSummaryDto> {
+        const contract = await this.contractsService.findOne(address)
+        if (contract && (!contract.scannable)) {
+            throw new HttpException(
+                'Contract is stopped.',
+                HttpStatus.NO_CONTENT
+            )
+        }
         return this.contractsService.stopScanning(address)
     }
 
@@ -156,7 +187,9 @@ export class ContractsController {
         description: 'Contract address',
         type: String,
     })
-    async clearEvents(@Param('address') address: string): Promise<Contract> {
+    async clearEvents(
+        @Param('address') address: string
+    ): Promise<ContractSummaryDto> {
         return this.contractsService.clearEvents(address)
     }
 }
