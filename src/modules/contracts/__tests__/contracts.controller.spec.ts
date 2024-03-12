@@ -7,8 +7,8 @@ import { mockContract1, mockContracts } from '@/mocks/contract.mock'
 import { ContractSummaryDto, CreateContractDto } from '../contract.dto'
 
 describe('ContractsController', () => {
-    let contractsController: ContractsController
     let contractsService: ContractsService
+    let contractsController: ContractsController
 
     beforeEach(async () => {
         const moduleRef = await Test.createTestingModule({
@@ -46,11 +46,11 @@ describe('ContractsController', () => {
     })
 
     it('should be defined', () => {
-        expect(contractsController).toBeDefined()
+        expect(contractsService).toBeDefined()
     })
 
     it('should be defined', () => {
-        expect(contractsService).toBeDefined()
+        expect(contractsController).toBeDefined()
     })
 
     describe('create', () => {

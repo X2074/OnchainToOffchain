@@ -20,8 +20,11 @@ class QueryCriteria {
 
     @IsObject()
     @IsOptional()
-    time?: object
+    time?: object;
+
+    [key: string]: any
 }
+
 export class QueryEventDto {
     @IsObject()
     @ValidateNested()

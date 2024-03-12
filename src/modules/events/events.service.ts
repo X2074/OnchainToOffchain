@@ -8,6 +8,7 @@ import isSameOrBefore from 'dayjs/plugin/isSameOrBefore'
 import utc from 'dayjs/plugin/utc'
 import quarterOfYear from 'dayjs/plugin/quarterOfYear'
 import weekOfYear from 'dayjs/plugin/weekOfYear'
+
 dayjs.extend(isSameOrBefore)
 dayjs.extend(utc)
 dayjs.extend(quarterOfYear)
@@ -20,17 +21,15 @@ export class EventsService {
         private readonly eventModel: Model<EventDocument>
     ) {}
 
-    async create(eventData) {
+    async create(eventData): Promise<Event> {
         eventData.address = eventData.address.toLowerCase()
-        const createdEvent = await this.eventModel.create(eventData)
-        return createdEvent
+        return this.eventModel.create(eventData)
     }
 
-    async deleteByAddress(address) {
-        const events = await this.eventModel
+    async deleteByAddress(address: string) {
+        return this.eventModel
             .deleteMany({ address: address.toLowerCase() })
             .exec()
-        return events
     }
 
     async find(
@@ -56,14 +55,22 @@ export class EventsService {
         return { total, events, page, pageSize }
     }
 
-    async countByAddress(address) {
-        const total = await this.eventModel
+    async countByAddress(address: string) {
+        return this.eventModel
             .countDocuments({ address: address.toLowerCase() })
             .exec()
-        return total
     }
 
-    async findByAddress(address, page, pageSize) {
+    async findByAddress(
+        address: string,
+        page: number,
+        pageSize: number
+    ): Promise<{
+        total: number
+        events: Event[]
+        page: number
+        pageSize: number
+    }> {
         const total = await this.eventModel.countDocuments({
             address: address.toLowerCase(),
         })
