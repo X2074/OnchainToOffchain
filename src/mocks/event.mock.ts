@@ -1,5 +1,41 @@
 import { Event } from '@/schema/event.schema'
 
+export const mockEvent1: Event = {
+    address: '0x15e1d56e0dc4d6e157b5e00376dfe2520fbe7e06',
+    blockHash:
+        '0x5156271b84b79ad8e2cd56a467b4991f1f432b8efa76a5acbc84675836fff7f9',
+    blockNumber: 638357,
+    data: '0x',
+    logIndex: 1,
+    raw: {
+        data: '0x',
+        topics: [
+            '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
+            '0x0000000000000000000000000000000000000000000000000000000000000000',
+            '0x000000000000000000000000656db657e8aa6b21912bda745a09c88311a72ff4',
+        ],
+    },
+    removed: false,
+    returnValues: {
+        '0': '0x0000000000000000000000000000000000000000',
+        '1': '0x656DB657E8Aa6b21912BDA745A09c88311a72Ff4',
+        __length__: '2',
+        previousOwner: '0x0000000000000000000000000000000000000000',
+        newOwner: '0x656DB657E8Aa6b21912BDA745A09c88311a72Ff4',
+    },
+    time: new Date('2023-06-13T06:41:53.000Z'),
+    topics: [
+        '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
+        '0x0000000000000000000000000000000000000000000000000000000000000000',
+        '0x000000000000000000000000656db657e8aa6b21912bda745a09c88311a72ff4',
+    ],
+    transactionHash:
+        '0x53dcf1e5fa62771183b7d8e4bebd0af3d004715f52e04537e0e7c8110a0aa1b8',
+    transactionIndex: 0,
+    event: 'OwnershipTransferred',
+    signature:
+        '0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0',
+}
 export const mockEvents: Event[] = [
     {
         address: '0x15e1d56e0dc4d6e157b5e00376dfe2520fbe7e06',

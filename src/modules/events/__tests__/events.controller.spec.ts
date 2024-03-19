@@ -81,12 +81,11 @@ describe('ContractsController', () => {
         })
     })
 
-    //Todo: Handle special cases where total > pageSize
     describe('getEvents', () => {
         it('should return an array of events', async () => {
             const expectedResult = {
-                total: mockEvents.length,
-                events: mockEvents,
+                total: mockEvents.length>10 ? 10 : mockEvents.length,
+                events: mockEvents.length>10 ? mockEvents.slice(1,10) : mockEvents,
                 page: 1,
                 pageSize: 10,
             }
@@ -102,7 +101,7 @@ describe('ContractsController', () => {
                 pageSize: 10,
             }
             expect(await eventsController.getEvents(queryEventDto)).toEqual(
-                mockEvents
+                expectedResult
             )
         })
     })
