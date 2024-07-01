@@ -13,6 +13,7 @@ const eventSchema = new Schema({
     topics: {type: Array, require: true},
     data: {type: String, require: true},
     logIndex: {type: Number, require: true},
+    fromAddress: {type: String, require: true},
     removed: {type: Boolean, require: true},
     returnValues: {type: Object, require: true},
     event: {type: String, require: true, index: true}, //对事件索引
