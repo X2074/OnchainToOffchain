@@ -30,6 +30,9 @@ export class Event {
     @Prop({ type: Number, require: true })
     logIndex: number
 
+    @Prop({ type: String, require: false })
+    fromAddress: string
+
     @Prop({ type: Boolean, require: true })
     removed: boolean
 

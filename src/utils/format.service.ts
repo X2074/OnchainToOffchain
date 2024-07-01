@@ -15,37 +15,29 @@ export class FormatService {
     }
 
     async formatEvents(events): Promise<Event[]> {
-        const promises = []
-        for (let i = 0; i < events.length; i++) {
-            const event = events[i]
-            const promise = this.web3.eth
-                .getBlock(event.blockNumber)
-                .then(block => {
-                    const timestamp = block.timestamp
-                    const newEvent = event
-                    newEvent.time = new Date(Number(timestamp) * 1000) // 将Unix时间戳转换为Date对象
-                    newEvent.blockNumber = Number(event.blockNumber)
-                    newEvent.transactionIndex = Number(event.transactionIndex)
-                    newEvent.logIndex = Number(event.logIndex)
-                    Object.keys(newEvent.returnValues).forEach(key => {
-                        if (typeof newEvent.returnValues[key] === 'object') {
-                            Object.keys(newEvent.returnValues[key]).forEach(
-                                key2 => {
-                                    newEvent.returnValues[key][key2] =
-                                        newEvent.returnValues[key][
-                                            key2
-                                        ].toString()
-                                }
-                            )
-                        } else {
-                            newEvent.returnValues[key] =
-                                newEvent.returnValues[key].toString()
-                        }
-                    })
-                    return newEvent
-                })
-            promises.push(promise)
-        }
+        const promises = events.map(event =>
+            Promise.all([
+                this.web3.eth.getBlock(event.blockNumber),
+                this.web3.eth.getTransaction(event.transactionHash)
+            ]).then(([block, transaction]) => {
+                const newEvent = event
+                newEvent.time =  new Date(Number(block.timestamp) * 1000) // 将Unix时间戳转换为Date对象
+                newEvent.blockNumber = Number(event.blockNumber)
+                newEvent.transactionIndex = Number(event.transactionIndex)
+                newEvent.logIndex = Number(event.logIndex)
+                newEvent.fromAddress = transaction.from
+                Object.keys(newEvent.returnValues).forEach(key => {
+                    if(typeof(newEvent.returnValues[key])==='object'){
+                        Object.keys(newEvent.returnValues[key]).forEach(key2 => {
+                            newEvent.returnValues[key][key2] = newEvent.returnValues[key][key2].toString()
+                        })
+                    }else{
+                        newEvent.returnValues[key] = newEvent.returnValues[key].toString();
+                    }
+                });
+                return newEvent
+            })
+        );
         return await Promise.all(promises)
     }
 
