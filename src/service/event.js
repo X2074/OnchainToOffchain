@@ -81,25 +81,25 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
         while (currentTime.isSameOrBefore(lastTime)) {
             switch(unit) {
                 case 'hour':
-                    times.push(currentTime.format('yyyy-MM-dd HH:00:00'));
+                    times.push(currentTime.format('YYYY-MM-DD HH:00:00'));
                     break;
                 case 'day':
-                    times.push(currentTime.format('yyyy-MM-dd'));
+                    times.push(currentTime.format('YYYY-MM-DD'));
                     break;
                 case 'week':
-                    times.push(currentTime.format('yyyy') + '-W' + String(currentTime.week()).padStart(2, '0')); // 表示年份和该年中的周数，例如 "2023-W15"
+                    times.push(currentTime.format('YYYY') + '-W' + String(currentTime.week()).padStart(2, '0')); // 表示年份和该年中的周数，例如 "2023-W15"
                     break;
                 case 'month':
-                    times.push(currentTime.format('yyyy-MM'));
+                    times.push(currentTime.format('YYYY-MM'));
                     break;
                 case 'quarter':
-                    times.push(currentTime.format('yyyy') + '-Q' + currentTime.quarter()); // 表示年份和季度
+                    times.push(currentTime.format('YYYY') + '-Q' + currentTime.quarter()); // 表示年份和季度
                     break;
                 case 'year':
-                    times.push(currentTime.format('yyyy'));
+                    times.push(currentTime.format('YYYY'));
                     break;
                 default: // 默认按天处理
-                    times.push(currentTime.format('yyyy-MM-dd'));
+                    times.push(currentTime.format('YYYY-MM-DD'));
                     break;
 
             }
@@ -118,25 +118,25 @@ exports.getEventsStatistics = async (queryCriteria, groupField, unit, startTime,
                 time = 'all';
                 break;
             case 'hour':
-                time = dayjs(event.time).utc().format('yyyy-MM-dd HH:00:00');
+                time = dayjs(event.time).utc().format('YYYY-MM-DD HH:00:00');
                 break;
             case 'day':
-                time = dayjs(event.time).utc().format('yyyy-MM-dd');
+                time = dayjs(event.time).utc().format('YYYY-MM-DD');
                 break;
             case 'week':
-                time = dayjs(event.time).utc().format('yyyy') + '-W' + String(dayjs(event.time).utc().week()).padStart(2, '0');
+                time = dayjs(event.time).utc().format('YYYY') + '-W' + String(dayjs(event.time).utc().week()).padStart(2, '0');
                 break;
             case 'month':
-                time = dayjs(event.time).utc().format('yyyy-MM');
+                time = dayjs(event.time).utc().format('YYYY-MM');
                 break;
             case 'quarter':
-                time = dayjs(event.time).utc().format('yyyy') + '-Q' + dayjs(event.time).utc().quarter();
+                time = dayjs(event.time).utc().format('YYYY') + '-Q' + dayjs(event.time).utc().quarter();
                 break;
             case 'year':
-                time = dayjs(event.time).utc().format('yyyy');
+                time = dayjs(event.time).utc().format('YYYY');
                 break;
             default: // 默认按天处理
-                time = dayjs(event.time).utc().format('yyyy-MM-dd');
+                time = dayjs(event.time).utc().format('YYYY-MM-DD');
                 break;
         }
         const keyList = []
