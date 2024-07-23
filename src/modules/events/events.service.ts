@@ -128,33 +128,33 @@ export class EventsService {
             while (currentTime.isSameOrBefore(lastTime)) {
                 switch (unit) {
                     case 'hour':
-                        times.push(currentTime.format('YYYY-MM-DD HH:00:00'))
+                        times.push(currentTime.format('yyyy-MM-dd HH:00:00'))
                         break
                     case 'day':
-                        times.push(currentTime.format('YYYY-MM-DD'))
+                        times.push(currentTime.format('yyyy-MM-dd'))
                         break
                     case 'week':
                         times.push(
-                            currentTime.format('YYYY') +
+                            currentTime.format('yyyy') +
                                 '-W' +
                                 String(currentTime.week()).padStart(2, '0')
                         ) // 表示年份和该年中的周数，例如 "2023-W15"
                         break
                     case 'month':
-                        times.push(currentTime.format('YYYY-MM'))
+                        times.push(currentTime.format('yyyy-MM'))
                         break
                     case 'quarter':
                         times.push(
-                            currentTime.format('YYYY') +
+                            currentTime.format('yyyy') +
                                 '-Q' +
                                 currentTime.quarter()
                         ) // 表示年份和季度
                         break
                     case 'year':
-                        times.push(currentTime.format('YYYY'))
+                        times.push(currentTime.format('yyyy'))
                         break
                     default: // 默认按天处理
-                        times.push(currentTime.format('YYYY-MM-DD'))
+                        times.push(currentTime.format('yyyy-MM-dd'))
                         break
                 }
                 currentTime = currentTime.add(1, unit)
@@ -178,31 +178,31 @@ export class EventsService {
                     time = 'all'
                     break
                 case 'hour':
-                    time = dayjs(event.time).utc().format('YYYY-MM-DD HH:00:00')
+                    time = dayjs(event.time).utc().format('yyyy-MM-dd HH:00:00')
                     break
                 case 'day':
-                    time = dayjs(event.time).utc().format('YYYY-MM-DD')
+                    time = dayjs(event.time).utc().format('yyyy-MM-dd')
                     break
                 case 'week':
                     time =
-                        dayjs(event.time).utc().format('YYYY') +
+                        dayjs(event.time).utc().format('yyyy') +
                         '-W' +
                         String(dayjs(event.time).utc().week()).padStart(2, '0')
                     break
                 case 'month':
-                    time = dayjs(event.time).utc().format('YYYY-MM')
+                    time = dayjs(event.time).utc().format('yyyy-MM')
                     break
                 case 'quarter':
                     time =
-                        dayjs(event.time).utc().format('YYYY') +
+                        dayjs(event.time).utc().format('yyyy') +
                         '-Q' +
                         dayjs(event.time).utc().quarter()
                     break
                 case 'year':
-                    time = dayjs(event.time).utc().format('YYYY')
+                    time = dayjs(event.time).utc().format('yyyy')
                     break
                 default: // 默认按天处理
-                    time = dayjs(event.time).utc().format('YYYY-MM-DD')
+                    time = dayjs(event.time).utc().format('yyyy-MM-dd')
                     break
             }
             const keyList = []

@@ -21,7 +21,7 @@ import DailyRotateFile from 'winston-daily-rotate-file'
                     level: configService.get('log.level'),
                     dirname: 'logs',
                     filename: 'application-%DATE%.log',
-                    datePattern: 'YYYY-MM-DD',
+                    datePattern: 'yyyy-MM-dd',
                     zippedArchive: true,
                     maxSize: '10m',
                     maxFiles: '30d',
